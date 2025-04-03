@@ -1,0 +1,100 @@
+/* General Fixes */
+html, body {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  background-color: #f8f9fa;
+}
+
+/* Page Layout */
+.homepage {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Floating Blobs */
+.floating-blobs .blob {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  animation: float 4s infinite ease-in-out alternate;
+  opacity: 0.8;
+}
+
+.blob-1 {
+  top: 15%;
+  left: 10%;
+  background-color: rgba(54, 162, 235, 0.5);
+  animation-delay: 0s;
+}
+
+.blob-2 {
+  top: 50%;
+  right: 20%;
+  background-color: rgba(255, 99, 132, 0.5);
+  animation-delay: 1s;
+}
+
+.blob-3 {
+  bottom: 20%;
+  left: 50%;
+  background-color: rgba(255, 206, 86, 0.5);
+  animation-delay: 2s;
+}
+
+/* Floating Animation */
+@keyframes float {
+  0% { transform: translateY(0px) translateX(0px); }
+  50% { transform: translateY(-20px) translateX(10px); }
+  100% { transform: translateY(0px) translateX(0px); }
+}
+
+/* Water Droplets */
+.water-drops {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.water-drop {
+  position: absolute;
+  width: 5px;
+  height: 15px;
+  background-color: rgba(140, 195, 231, 0.8);
+  opacity: 0.7;
+  animation: water-drop-fall 1.2s infinite linear;
+}
+
+@keyframes water-drop-fall {
+  0% { transform: translateY(-50px); opacity: 0.5; }
+  100% { transform: translateY(600px); opacity: 0; }
+}
+
+/* Moving Waves */
+.wave-top, .wave-bottom {
+  width: 100%;
+  height: 20px;
+}
+
+.wave-top {
+  top: 0;
+  left: 0;
+}
+
+.wave-bottom {
+  bottom: 0;
+  left: 0;
+}
+
+/* Fast Wave Animation */
+.wave-moving {
+  animation: moveWave 3s infinite linear alternate;
+}
+
+@keyframes moveWave {
+  0% { transform: translateX(0px); }
+  50% { transform: translateX(-30px); }
+  100% { transform: translateX(0px); }
+}

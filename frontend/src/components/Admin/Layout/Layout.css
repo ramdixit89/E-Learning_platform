@@ -1,0 +1,30 @@
+/* Dashboard Layout */
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #f8f9fa; /* Light background for contrast */
+  }
+  
+  /* Sidebar Styling */
+  .sidebar {
+    background: black;
+    color: white;
+    min-height: 100vh;
+  }
+  
+  /* Main Content Styling */
+  .main-content {
+    background: white;
+    min-height: 100vh;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  
+  /* Responsive Sidebar */
+  @media (max-width: 768px) {
+    .sidebar {
+      display: none;
+    }
+  }
+  
