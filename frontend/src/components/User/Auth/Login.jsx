@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
-const API_URL = "http://localhost:8000/auth/login";
+const API_URL = import.meta.env.VITE_BASE_URL;
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
@@ -25,7 +25,7 @@ const Login = () => {
     }
 
     try {
-      const response = await axios.post(`${API_URL}`, formData);
+      const response = await axios.post(`${API_URL}/auth/login`, formData);
       const { token } = response.data;
       localStorage.setItem("token", token);
       localStorage.setItem('userId', response.data.user.id);

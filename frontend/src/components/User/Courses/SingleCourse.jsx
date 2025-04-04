@@ -4,7 +4,7 @@ import axios from "axios";
 import { FaArrowLeft, FaArrowRight, FaCertificate } from "react-icons/fa";
 import { motion } from "framer-motion";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+const API_URL = import.meta.env.VITE_BASE_URL;
 const SingleCourse = () => {
   const { id } = useParams();
   const [course, setCourse] = useState(null);
@@ -14,7 +14,7 @@ const SingleCourse = () => {
   const fetchCourse = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8000/api/course/get-single-course/${id}`,
+        `${API_URL}/api/course/get-single-course/${id}`,
         {
           headers: {
             Authorization: `Bearer YOUR_ACCESS_TOKEN`, // Replace with actual token
@@ -53,7 +53,7 @@ const SingleCourse = () => {
       setCertificateGenerated(true);
       try {
         const response = await axios.post(
-          "http://localhost:8000/api/complete-course/complete",
+          `${API_URL}/api/complete-course/complete`,
           {
             userId: localStorage.getItem("userId"),
             courseId: course._id,

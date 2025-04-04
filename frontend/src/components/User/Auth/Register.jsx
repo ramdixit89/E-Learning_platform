@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const API_URL = "http://localhost:8000/auth/register";
+const API_URL = import.meta.env.VITE_BASE_URL;
 
 const Register = () => {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const Register = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

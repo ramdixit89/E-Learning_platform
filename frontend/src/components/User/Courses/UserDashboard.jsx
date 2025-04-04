@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaCertificate, FaBook, FaUser, FaSignOutAlt } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+const API_URL = import.meta.env.VITE_BASE_URL;
 const UserDashboard = () => {
   const [user, setUser] = useState(null);
   const [completedCourses, setCompletedCourses] = useState([]);
@@ -12,7 +12,7 @@ const UserDashboard = () => {
   useEffect(() => {
     if (userId && token) {
       axios
-        .get(`http://localhost:8000/auth/singleUser/${userId}`, {
+        .get(`${API_URL}/auth/singleUser/${userId}`, {
           headers: { Authorization: token },
         })
         .then((response) => {
@@ -27,7 +27,7 @@ const UserDashboard = () => {
   useEffect(() => {
     if (userId && token) {
       axios
-        .get(`http://localhost:8000/api/complete-course/completed/${userId}`, {
+        .get(`${API_URL}/api/complete-course/completed/${userId}`, {
           headers: { Authorization: token },
         })
         .then((response) => {
