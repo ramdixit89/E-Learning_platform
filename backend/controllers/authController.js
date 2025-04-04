@@ -1,6 +1,6 @@
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const otpGen = require('otp-generator');
 const { uploadImage } = require('../config/uploadImage'); // Import Image Upload Function
