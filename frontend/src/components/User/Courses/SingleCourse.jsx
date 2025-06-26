@@ -4,7 +4,9 @@ import axios from "axios";
 import { FaArrowLeft, FaArrowRight, FaCertificate } from "react-icons/fa";
 import { motion } from "framer-motion";
 import "bootstrap/dist/css/bootstrap.min.css";
+
 const API_URL = import.meta.env.VITE_BASE_URL;
+
 const SingleCourse = () => {
   const { id } = useParams();
   const [course, setCourse] = useState(null);
@@ -17,7 +19,7 @@ const SingleCourse = () => {
         `${API_URL}/api/course/get-single-course/${id}`,
         {
           headers: {
-            Authorization: `Bearer YOUR_ACCESS_TOKEN`, // Replace with actual token
+            Authorization: localStorage.getItem("token"),
           },
         }
       );
@@ -44,15 +46,17 @@ const SingleCourse = () => {
       </div>
     );
   }
+
   const topics = course.topics || [];
   const progress = ((currentTopicIndex + 1) / topics.length) * 100;
+
   const handleNext = async () => {
     if (currentTopicIndex < topics.length - 1) {
       setCurrentTopicIndex((prev) => prev + 1);
     } else {
       setCertificateGenerated(true);
       try {
-        const response = await axios.post(
+        await axios.post(
           `${API_URL}/api/complete-course/complete`,
           {
             userId: localStorage.getItem("userId"),
@@ -60,20 +64,48 @@ const SingleCourse = () => {
             courseTitle: course.title,
           },
           {
-            headers: { Authorization: localStorage.getItem("token")},
+            headers: { Authorization: localStorage.getItem("token") },
           }
         );
-        console.log(response.data.message);
+        console.log("Course marked as completed.");
       } catch (error) {
         console.error("Error marking course as completed:", error.response?.data);
       }
     }
   };
+
   const handlePrevious = () => {
     if (currentTopicIndex > 0) {
       setCurrentTopicIndex((prev) => prev - 1);
     }
   };
+
+  const handleDownloadCertificate = async () => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/complete-course/generate-certificate`,
+        {
+          userId: localStorage.getItem("userId"),
+          courseId: course._id,
+        },
+        {
+          headers: { Authorization: localStorage.getItem("token") },
+          responseType: "blob", // Important for file download
+        }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `${course.title}_certificate.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading certificate:", error.response?.data || error);
+    }
+  };
+
   return (
     <div className="container py-5 text-center">
       <motion.div
@@ -117,7 +149,6 @@ const SingleCourse = () => {
           }}
         ></p>
 
-        {/* Progress Percentage */}
         <h5 className="text-success fw-bold mb-2">{progress.toFixed(2)}% Completed</h5>
 
         <div className="progress mb-3" style={{ height: "10px" }}>
@@ -175,7 +206,7 @@ const SingleCourse = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             className="btn btn-success px-4 py-2 fw-bold shadow-sm d-flex align-items-center gap-2"
-            onClick={() => alert("Certificate Generated!")}
+            onClick={handleDownloadCertificate}
           >
             <FaCertificate /> 🎓 Download Certificate
           </motion.button>
