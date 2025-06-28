@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaCertificate, FaBook, FaUser, FaSignOutAlt } from "react-icons/fa";
+import {
+  FaCertificate,
+  FaBook,
+  FaUser,
+  FaSignOutAlt,
+  FaGraduationCap,
+} from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const API_URL = import.meta.env.VITE_BASE_URL;
@@ -8,7 +14,6 @@ const API_URL = import.meta.env.VITE_BASE_URL;
 const UserDashboard = () => {
   const [user, setUser] = useState(null);
   const [completedCourses, setCompletedCourses] = useState([]);
-
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
 
@@ -30,7 +35,9 @@ const UserDashboard = () => {
           headers: { Authorization: token },
         })
         .then((res) => setCompletedCourses(res.data.courses || []))
-        .catch((err) => console.error("Error fetching completed courses:", err));
+        .catch((err) =>
+          console.error("Error fetching completed courses:", err)
+        );
     }
   }, [userId, token]);
 
@@ -41,7 +48,10 @@ const UserDashboard = () => {
       console.log("course title ", courseTitle);
       const response = await axios.post(
         `${API_URL}/api/complete-course/generate-certificate`,
-        { userId : user._id, courseId },
+        {
+          userId,
+          courseId,
+        },
         {
           headers: { Authorization: token },
           responseType: "blob",
@@ -66,7 +76,7 @@ const UserDashboard = () => {
   return (
     <div className="d-flex min-vh-100">
       {/* Sidebar */}
-      <div className="bg-dark text-white p-4" style={{ width: "250px" }}>
+      {/* <div className="bg-dark text-white p-4" style={{ width: "250px" }}>
         <h4 className="text-center mb-5">🎓 RDCoders</h4>
         <ul className="nav flex-column gap-3">
           <li className="nav-item">
@@ -90,18 +100,43 @@ const UserDashboard = () => {
             </span>
           </li>
         </ul>
-      </div>
+      </div> */}
 
       {/* Main Content */}
       <div className="flex-grow-1 p-4 bg-light">
-        <div className="card p-4 shadow-sm border-0 mb-4 bg-white">
+        {/* <div className="card p-4 shadow-sm border-0 mb-4 bg-white">
           <h2 className="fw-bold mb-1">Welcome, {user.username}!</h2>
           <p className="text-muted mb-0">{user.email}</p>
-        </div>
+        </div> */}
+<div className="d-flex justify-content-center align-items-center mb-4">
+  <div className="card p-4 shadow-sm border-0 bg-white d-flex flex-column flex-md-row align-items-center gap-4">
+    {/* User Icon or Image */}
+    <div className="flex-shrink-0">
+      <div
+        className="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center"
+        style={{ width: "100px", height: "100px", fontSize: "48px" }}
+      >
+        <FaUser />
+      </div>
+    </div>
+
+    {/* User Info */}
+    <div className="text-center text-md-start">
+      <h4 className="fw-semibold text-uppercase text-primary mb-1">Learner Profile</h4>
+      <h2 className="fw-bold mb-1">{user.username}</h2>
+      <p className="text-muted mb-1">{user.email}</p>
+      <p className="text-success fw-medium mt-2">
+         Keep pushing forward — your journey with RDCoders continues!
+      </p>
+    </div>
+  </div>
+</div>
+
+
 
         <div className="mb-4">
           <h4 className="fw-bold text-center mb-4">
-            🎉 Certificates earned by <span className="text-primary">{user.username}</span>
+            Certificates earned by <span className="text-primary">{user.username}</span>
           </h4>
 
           <div className="row">
@@ -109,14 +144,20 @@ const UserDashboard = () => {
               completedCourses.map((course, index) => (
                 <div key={index} className="col-md-6 col-lg-4 mb-4">
                   <div className="card h-100 shadow-sm border-0">
-                    <div className="card-body text-center">
-                      <h5 className="fw-bold">{course.courseTitle}</h5>
-                      <p className="text-muted">
-                        Issued on: {new Date(course.completionDate).toLocaleDateString()}
-                      </p>
+                    <div className="card-body text-center d-flex flex-column justify-content-between">
+                      <div>
+                        <h5 className="fw-bold mb-2">{course.courseTitle}</h5>
+                        <p className="text-muted mb-2">
+                          <FaGraduationCap className="me-2 text-warning" />
+                          Issued on:{" "}
+                          {new Date(course.completionDate).toLocaleDateString()}
+                        </p>
+                      </div>
                       <button
-                        onClick={() => handleDownloadCertificate(course._id, course.courseTitle)}
-                        className="btn btn-success w-100 mt-3"
+                        onClick={() =>
+                          handleDownloadCertificate(course.courseId, course.courseTitle)
+                        }
+                        className="btn btn-outline-primary mt-auto"
                       >
                         <FaCertificate className="me-2" />
                         Download Certificate
@@ -126,7 +167,9 @@ const UserDashboard = () => {
                 </div>
               ))
             ) : (
-              <p className="text-center text-muted">No completed courses found.</p>
+              <p className="text-center text-muted">
+                No completed courses yet. Your learning journey starts now! 📘
+              </p>
             )}
           </div>
         </div>

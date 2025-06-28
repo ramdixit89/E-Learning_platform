@@ -3,7 +3,7 @@ import { Navbar, Nav, Container, Dropdown } from "react-bootstrap";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { FaUser, FaBook, FaInfoCircle, FaPhone, FaSignInAlt, FaUserPlus } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+import logo from './logo.png'
 const Header = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
