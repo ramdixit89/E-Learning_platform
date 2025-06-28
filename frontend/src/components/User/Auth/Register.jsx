@@ -63,7 +63,7 @@ const Register = () => {
                   type="text"
                   name="username"
                   className="form-control"
-                  placeholder="Username"
+                  placeholder="Enter your Full name"
                   value={formData.username}
                   onChange={handleChange}
                   required

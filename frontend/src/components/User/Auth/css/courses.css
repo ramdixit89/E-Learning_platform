@@ -1,0 +1,59 @@
+.right-sidebar {
+  width: 240px;
+  background-color: #f4f6f9;
+  box-shadow: -2px 0 6px rgba(0, 0, 0, 0.05);
+  border-radius: 0 0 0 12px;
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.notification-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: scroll-vertical 10s linear infinite;
+}
+
+@keyframes scroll-vertical {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+.course-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.course-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+}
+
+.btn-gradient {
+  background: linear-gradient(to right, #4facfe, #00f2fe);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+}
+.btn-gradient:hover {
+  opacity: 0.9;
+  color: white;
+}
+@keyframes scroll-vertical {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+.notification-scroll {
+  height: 100%;
+  animation-play-state: running;
+}

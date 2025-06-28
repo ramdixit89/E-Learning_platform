@@ -18,9 +18,7 @@ const SingleCourse = () => {
       const response = await axios.get(
         `${API_URL}/api/course/get-single-course/${id}`,
         {
-          headers: {
-            Authorization: localStorage.getItem("token"),
-          },
+          headers: { Authorization: localStorage.getItem("token") },
         }
       );
       setCourse(response.data.course);
@@ -36,11 +34,7 @@ const SingleCourse = () => {
   if (!course) {
     return (
       <div className="text-center py-5">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
           Loading course details...
         </motion.div>
       </div>
@@ -63,9 +57,7 @@ const SingleCourse = () => {
             courseId: course._id,
             courseTitle: course.title,
           },
-          {
-            headers: { Authorization: localStorage.getItem("token") },
-          }
+          { headers: { Authorization: localStorage.getItem("token") } }
         );
         console.log("Course marked as completed.");
       } catch (error) {
@@ -90,10 +82,9 @@ const SingleCourse = () => {
         },
         {
           headers: { Authorization: localStorage.getItem("token") },
-          responseType: "blob", // Important for file download
+          responseType: "blob",
         }
       );
-
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -107,110 +98,94 @@ const SingleCourse = () => {
   };
 
   return (
-    <div className="container py-5 text-center">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="mb-4"
-      >
-        <img
-          src={course.thumbnail}
-          alt={course.title}
-          className="img-fluid rounded shadow-lg"
-          style={{ maxWidth: "400px" }}
-        />
-        <h2 className="mt-3 text-primary fw-bold">{course.title} Content</h2>
-        <p
-          className="text-muted text-center"
-          style={{ textAlign: "justify" }}
-          dangerouslySetInnerHTML={{ __html: course.description }}
-        ></p>
-      </motion.div>
+    <div className="container py-5">
+      {/* Course Header */}
+      <div className="row align-items-center mb-5">
+        <div className="col-md-5 text-center">
+          <img
+            src={course.thumbnail}
+            alt={course.title}
+            className="img-fluid rounded-4 shadow-sm"
+            style={{ maxHeight: "280px", objectFit: "cover" }}
+          />
+        </div>
+        <div className="col-md-7">
+          <h2 className="text-primary fw-bold">{course.title}</h2>
+          <p className="text-muted mt-3" style={{ textAlign: "justify" }} dangerouslySetInnerHTML={{ __html: course.description }}></p>
+          <span className="badge bg-success fs-6 mt-2">{topics.length} Topics Included</span>
+          <div className="mt-3">
+            <h5 className="text-info">"Knowledge is the key to unlock your future!"</h5>
+            <p className="fst-italic text-secondary">Join us and let your learning adventure begin...</p>
+          </div>
+        </div>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="card p-4 shadow-lg border-0 rounded"
-        style={{
-          background: "linear-gradient(to right, #f8f9fa, #eef1f6)",
-          borderRadius: "15px",
-        }}
-      >
-        <h4 className="mb-3 text-dark fw-semibold text-center">
+      {/* Topic Content */}
+      <div className="card p-4 shadow-lg border-0 rounded-4 mb-4 bg-white">
+        <h4 className="text-center text-dark fw-semibold mb-3">
           {topics[currentTopicIndex]?.title}
         </h4>
-        <p
-          className="text-muted text-justify"
-          style={{ textAlign: "justify" }}
-          dangerouslySetInnerHTML={{
-            __html: topics[currentTopicIndex]?.content,
-          }}
-        ></p>
-
-        <h5 className="text-success fw-bold mb-2">{progress.toFixed(2)}% Completed</h5>
-
-        <div className="progress mb-3" style={{ height: "10px" }}>
-          <div
-            className="progress-bar"
-            role="progressbar"
-            style={{
-              width: `${progress}%`,
-              background: "linear-gradient(to right, #4caf50, #2e7d32)",
-            }}
-            aria-valuenow={progress}
-            aria-valuemin="0"
-            aria-valuemax="100"
-          ></div>
+        <div
+          className="px-2 text-muted"
+          style={{ maxHeight: "250px", overflowY: "auto", textAlign: "justify" }}
+          dangerouslySetInnerHTML={{ __html: topics[currentTopicIndex]?.content }}
+        ></div>
+        {/* Progress Bar */}
+        <div className="mt-4">
+          <h6 className="text-success fw-bold mb-1">Progress: {progress.toFixed(2)}%</h6>
+          <div className="progress" style={{ height: "10px" }}>
+            <div
+              className="progress-bar bg-success"
+              role="progressbar"
+              style={{ width: `${progress}%` }}
+              aria-valuenow={progress}
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
+          </div>
         </div>
-
-        <div className="d-flex justify-content-between">
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="btn btn-outline-secondary px-4 py-2 fw-bold shadow-sm d-flex align-items-center gap-2"
+        {/* Navigation Buttons */}
+        <div className="d-flex justify-content-between mt-4">
+          <button
+            className="btn btn-outline-secondary fw-semibold px-4 py-2"
             onClick={handlePrevious}
             disabled={currentTopicIndex === 0}
           >
-            <FaArrowLeft />
-            {currentTopicIndex > 0
-              ? topics[currentTopicIndex - 1].title
-              : "Previous"}
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="btn btn-primary px-4 py-2 fw-bold shadow-sm d-flex align-items-center gap-2"
+            <FaArrowLeft className="me-2" />
+            {currentTopicIndex > 0 ? topics[currentTopicIndex - 1].title : "Previous"}
+          </button>
+          <button
+            className="btn btn-primary fw-semibold px-4 py-2"
             onClick={handleNext}
           >
-            {currentTopicIndex === topics.length - 1 ? "Finish 🎉" : `Next `}
-            {topics[currentTopicIndex + 1]?.title} <FaArrowRight />
-          </motion.button>
+            {currentTopicIndex === topics.length - 1 ? "Finish 🎉" : `Next: ${topics[currentTopicIndex + 1]?.title || ""}`}
+            <FaArrowRight className="ms-2" />
+          </button>
         </div>
-      </motion.div>
+      </div>
 
+      {/* Certificate Section */}
       {certificateGenerated && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="mt-4 p-4 bg-light rounded shadow-sm"
-        >
-          <h3 className="text-success">Congratulations! 🎉</h3>
-          <p className="text-muted text-justify" style={{ textAlign: "justify" }}>
-            You have successfully completed the course.
+        <div className="card bg-light p-4 rounded-4 border-0 shadow-sm">
+          <h3 className="text-success fw-bold mb-2 text-center">🎉 Congratulations!</h3>
+          <p className="text-muted text-center mb-4">
+            You have successfully completed the course. Your journey to success has just begun!
           </p>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="btn btn-success px-4 py-2 fw-bold shadow-sm d-flex align-items-center gap-2"
-            onClick={handleDownloadCertificate}
-          >
-            <FaCertificate /> 🎓 Download Certificate
-          </motion.button>
-        </motion.div>
+          <div className="text-center">
+            <button
+              className="btn btn-success btn-lg fw-bold d-inline-flex align-items-center"
+              onClick={handleDownloadCertificate}
+            >
+              <FaCertificate className="me-2" />
+              Download Certificate
+            </button>
+          </div>
+          <div className="mt-3">
+            <p className="fs-6 fst-italic text-info">
+              "Keep learning, keep growing! Your achievements are our motivation."
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );
