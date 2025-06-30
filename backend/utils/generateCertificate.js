@@ -4,7 +4,7 @@ const path = require("path");
 
 const generateCertificate = ({ username, courseTitle, userId, courseId }) => {
   return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ size: "A4", layout: "landscape", margin: 50 });
+    const doc = new PDFDocument({ size: "A4", layout: "landscape", margin: 40 });
 
     const certPath = path.join(__dirname, `certificates/${userId}_${courseId}.pdf`);
     const dir = path.dirname(certPath);
@@ -16,83 +16,85 @@ const generateCertificate = ({ username, courseTitle, userId, courseId }) => {
     // Background
     doc.rect(0, 0, doc.page.width, doc.page.height).fill("#fffdf6");
 
-    // Border
-    doc
-      .lineWidth(4)
-      .strokeColor("#d4af37")
-      .rect(20, 20, doc.page.width - 40, doc.page.height - 40)
-      .stroke();
+    // Top & Bottom Border Lines
+    doc.lineWidth(3).strokeColor("#d4af37");
+    doc.moveTo(40, 40).lineTo(doc.page.width - 40, 40).stroke();
+    doc.moveTo(40, doc.page.height - 40).lineTo(doc.page.width - 40, doc.page.height - 40).stroke();
 
-    // RDCoders Logo
-    const logoPath = path.join(__dirname, "../uploads/RD_CODERS___2_-removebg-preview (1).png"); // adjust path if needed
+    // Logo
+    const logoPath = path.join(__dirname, "../uploads/logo.png");
+    console.log("Logo Path:", logoPath);  // Should print correct absolute path
+    console.log("Logo Exists:", fs.existsSync(logoPath));
     if (fs.existsSync(logoPath)) {
-      doc.image(logoPath, doc.page.width / 2 - 50, 40, { width: 100 });
+      console.log("Logo Exists:", fs.existsSync(logoPath)); // Add this line temporarily
+      doc.image(logoPath, doc.page.width / 2 - 50, 50, { width: 100 });
     }
-
+    
     // Title
     doc
-      .fontSize(34)
-      .fillColor("#222")
+      .fontSize(28)
+      .fillColor("#001f3f")
       .font("Helvetica-Bold")
-      .text("CERTIFICATE", { align: "center", lineGap: 4 });
+      .text("CERTIFICATE OF COMPLETION", 0, 130, { align: "center" });
 
+    // Presented text
     doc
-      .fontSize(18)
+      .fontSize(16)
+      .fillColor("#001f3f")
       .font("Helvetica")
-      .fillColor("#444")
-      .text("of Completion", { align: "center" });
+      .text("This certificate is proudly presented to", {
+        align: "center",
+      });
 
-    // Recipient Name
+    // Username
     doc
-      .moveDown(2)
-      .fontSize(24)
-      .fillColor("#000")
-      .font("Helvetica")
-      .text(`This certificate is awarded to`, { align: "center" });
-
-    doc
-      .moveDown(0.5)
+      .moveDown(0.3)
       .fontSize(30)
-      .fillColor("#d4af37")
+      .fillColor("#b8860b")
       .font("Helvetica-Bold")
       .text(username, { align: "center" });
 
+    // Course Completion Text
     doc
-      .moveDown(0.5)
-      .fontSize(20)
-      .fillColor("#000")
+      .moveDown(0.3)
+      .fontSize(16)
+      .fillColor("#001f3f")
       .font("Helvetica")
-      .text(`for successfully completing the course`, { align: "center" });
+      .text("For successfully completing the course", { align: "center" });
 
+    // Course Title
     doc
-      .moveDown(0.5)
-      .fontSize(26)
+      .moveDown(0.2)
+      .fontSize(24)
       .fillColor("#0a4d8c")
       .font("Helvetica-Bold")
       .text(courseTitle, { align: "center" });
 
-    // Footer Details
+    // Instructor Name
     doc
-      .moveDown(3)
-      .fontSize(12)
-      .fillColor("#888")
-      .text("RDCoders • Empowering Coders", { align: "center" });
-
-    // Instructor Signature Section
-    doc
-      .fontSize(16)
+      .fontSize(14)
       .fillColor("#000")
-      .text("Instructor: Ram Dixit", 70, doc.page.height - 100);
-
+      .font("Helvetica-Bold")
+      .text("Ram Dixit", 80, doc.page.height - 120);
     doc
       .fontSize(12)
       .fillColor("#444")
-      .text("Professional Educator", 70, doc.page.height - 80);
+      .font("Helvetica")
+      .text("Professional Educator", 80, doc.page.height - 100);
 
-    // Seal Image (Optional)
-    const sealPath = path.join(__dirname, "../uploads/seal.png"); // If you want to add a seal image
+    // Footer line
+    doc
+      .fontSize(12)
+      .fillColor("#444")
+      .font("Helvetica")
+      .text("RDCoders • Empowering Coders • www.rdcoders.com", 0, doc.page.height - 60, {
+        align: "center",
+      });
+
+    // Seal
+    const sealPath = path.join(__dirname, "./uploads/seal.png"); // Use your red seal image here
     if (fs.existsSync(sealPath)) {
-      doc.image(sealPath, doc.page.width - 150, doc.page.height - 150, { width: 100 });
+      doc.image(sealPath, doc.page.width - 160, doc.page.height - 160, { width: 100 });
     }
 
     doc.end();
