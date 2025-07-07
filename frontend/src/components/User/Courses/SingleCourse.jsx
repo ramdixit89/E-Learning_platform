@@ -98,7 +98,7 @@ const SingleCourse = () => {
   };
 
   return (
-    <div className="container py-5">
+    <div className="container-fluid py-5">
       {/* Course Header */}
       <div className="row align-items-center mb-5">
         <div className="col-md-5 text-center">
@@ -127,7 +127,7 @@ const SingleCourse = () => {
         </h4>
         <div
           className="px-2 text-muted"
-          style={{ maxHeight: "250px", overflowY: "auto", textAlign: "justify" }}
+          style={{  textAlign: "justify" }}
           dangerouslySetInnerHTML={{ __html: topics[currentTopicIndex]?.content }}
         ></div>
         {/* Progress Bar */}
