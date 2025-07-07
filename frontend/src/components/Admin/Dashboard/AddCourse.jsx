@@ -12,13 +12,55 @@ const AddCourse = () => {
   const [topics, setTopics] = useState([{ title: "", content: "" }]);
 
   // Jodit Editor Configuration
-  const config = {
-    uploader: { insertImageAsBase64URI: true },
-    toolbarAdaptive: false,
-    toolbarSticky: false,
-    spellcheck: true,
-    buttons: "bold,italic,underline,|,ul,ol,|,image,link,|,undo,redo",
-  };
+const config = {
+  uploader: { insertImageAsBase64URI: true },
+  toolbarAdaptive: false,
+  toolbarSticky: false,
+  spellcheck: true,
+  readonly: false,
+  height: 300,
+  buttons: [
+    "source",
+    "|",
+    "bold",
+    "italic",
+    "underline",
+    "strikethrough",
+    "superscript",
+    "subscript",
+    "|",
+    "ul",
+    "ol",
+    "outdent",
+    "indent",
+    "|",
+    "font",
+    "fontsize",
+    "brush",
+    "paragraph",
+    "|",
+    "image",
+    "file",
+    "video",
+    "table",
+    "link",
+    "|",
+    "align",
+    "undo",
+    "redo",
+    "cut",
+    "copy",
+    "paste",
+    "|",
+    "hr",
+    "eraser",
+    "symbol",
+    "fullsize",
+    "print",
+    "about"
+  ],
+};
+
 
   // Handle Thumbnail Upload
   const handleThumbnailUpload = (e) => {
