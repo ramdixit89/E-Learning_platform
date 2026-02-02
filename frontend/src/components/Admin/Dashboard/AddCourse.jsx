@@ -94,7 +94,7 @@ const config = {
 
     try {
       const response = await axios.post(
-        `http://localhost:8000/api/course/add-course`,
+        `http://localhost:5000/api/course/add-course`,
         formData,
         {
           headers: {

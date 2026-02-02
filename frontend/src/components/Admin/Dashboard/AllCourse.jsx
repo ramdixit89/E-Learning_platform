@@ -8,7 +8,7 @@ const AllCourse = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/course/get-course`, {
+        const response = await axios.get(`http://localhost:5000/api/course/get-course`, {
           headers: {
             Authorization: `Bearer YOUR_ACCESS_TOKEN`, // Replace with actual token
           },
@@ -22,7 +22,7 @@ const AllCourse = () => {
   }, []);
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/api/course/delete-course/${id}`, {
+      await axios.delete(`http://localhost:5000/api/course/delete-course/${id}`, {
         headers: {
           Authorization: `Bearer YOUR_ACCESS_TOKEN`, // Replace with actual token
         },

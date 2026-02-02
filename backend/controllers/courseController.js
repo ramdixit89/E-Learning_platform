@@ -37,7 +37,7 @@ const createCourse = async (req, res) => {
 // 📌 Get all courses
 const getAllCourses = async (req, res) => {
   try {
-    const courses = await Course.find().populate("author", "name email");
+    const courses = await Course.find();
     res.status(200).json({ courses });
   } catch (error) {
     console.error("Error fetching courses:", error);
