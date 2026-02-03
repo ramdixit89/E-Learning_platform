@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { FaArrowLeft, FaArrowRight, FaCertificate } from "react-icons/fa";
+import { FaArrowLeft, FaArrowRight, FaCertificate, FaPlayCircle } from "react-icons/fa";
 import { motion } from "framer-motion";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -33,9 +33,9 @@ const SingleCourse = () => {
 
   if (!course) {
     return (
-      <div className="text-center py-5">
+      <div className="text-center py-5 d-flex align-items-center justify-content-center" style={{ minHeight: '80vh', color: 'var(--text-main)' }}>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-          Loading course details...
+          <h3>Loading course content...</h3>
         </motion.div>
       </div>
     );
@@ -98,94 +98,111 @@ const SingleCourse = () => {
   };
 
   return (
-    <div className="container-fluid py-5">
+    <div className="container py-5" style={{ paddingTop: '100px' }}>
       {/* Course Header */}
-      <div className="row align-items-center mb-5">
-        <div className="col-md-5 text-center">
-          <img
-            src={course.thumbnail}
-            alt={course.title}
-            className="img-fluid rounded-4 shadow-sm"
-            style={{ maxHeight: "280px", objectFit: "cover" }}
-          />
+      <motion.div 
+        className="row align-items-center mb-5 g-5"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div className="col-lg-5">
+           <div className="position-relative fw-bold text-center rounded-4 overflow-hidden shadow-lg border border-secondary" style={{ borderColor: 'var(--glass-border)' }}>
+             <img
+               src={course.thumbnail}
+               alt={course.title}
+               className="img-fluid"
+               style={{ width: '100%', objectFit: "cover" }}
+             />
+             <div className="position-absolute top-50 start-50 translate-middle">
+                <FaPlayCircle size={60} className="text-white opacity-75 drop-shadow" />
+             </div>
+           </div>
         </div>
-        <div className="col-md-7">
-          <h2 className="text-primary fw-bold">{course.title}</h2>
-          <p className="text-muted mt-3" style={{ textAlign: "justify" }} dangerouslySetInnerHTML={{ __html: course.description }}></p>
-          <span className="badge bg-success fs-6 mt-2">{topics.length} Topics Included</span>
-          <div className="mt-3">
-            <h5 className="text-info">"Knowledge is the key to unlock your future!"</h5>
-            <p className="fst-italic text-secondary">Join us and let your learning adventure begin...</p>
+        <div className="col-lg-7">
+          <div className="d-inline-block px-3 py-1 rounded-pill bg-primary bg-opacity-25 text-primary fw-bold mb-3 fs-7 border border-primary border-opacity-25">
+             Course
+          </div>
+          <h1 className="display-5 fw-bold mb-3">{course.title}</h1>
+          <p className="text-muted fs-5 mb-4" dangerouslySetInnerHTML={{ __html: course.description }}></p>
+          
+          <div className="d-flex align-items-center gap-4">
+            <span className="badge bg-success rounded-pill px-4 py-2 fs-6">
+               {topics.length} Topics
+            </span>
+            <div className="d-flex align-items-center gap-2">
+               <div className="progress w-100" style={{ height: "8px", width: "150px", backgroundColor: "var(--surface-light)" }}>
+                 <div className="progress-bar bg-gradient-to-r from-primary to-accent" role="progressbar" style={{ width: `${progress}%`, background: 'var(--gradient-main)' }}></div>
+               </div>
+               <small className="text-muted">{Math.round(progress)}% Completed</small>
+            </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Topic Content */}
-      <div className="card p-4 shadow-lg border-0 rounded-4 mb-4 bg-white">
-        <h4 className="text-center text-dark fw-semibold mb-3">
-          {topics[currentTopicIndex]?.title}
-        </h4>
+      <motion.div 
+        className="card-premium mb-5"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <div className="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary pb-3" style={{ borderColor: 'var(--glass-border)' }}>
+          <h3 className="fw-bold mb-0 text-light">
+             <span className="text-gradient">#{currentTopicIndex + 1}</span> {topics[currentTopicIndex]?.title}
+          </h3>
+        </div>
+        
         <div
-          className="px-2 text-muted"
-          style={{  textAlign: "justify" }}
+          className="px-2 text-muted fw-light fs-5 mb-5"
+          style={{ lineHeight: '1.8' }}
           dangerouslySetInnerHTML={{ __html: topics[currentTopicIndex]?.content }}
         ></div>
-        {/* Progress Bar */}
-        <div className="mt-4">
-          <h6 className="text-success fw-bold mb-1">Progress: {progress.toFixed(2)}%</h6>
-          <div className="progress" style={{ height: "10px" }}>
-            <div
-              className="progress-bar bg-success"
-              role="progressbar"
-              style={{ width: `${progress}%` }}
-              aria-valuenow={progress}
-              aria-valuemin="0"
-              aria-valuemax="100"
-            ></div>
-          </div>
-        </div>
+        
         {/* Navigation Buttons */}
-        <div className="d-flex justify-content-between mt-4">
+        <div className="d-flex justify-content-between mt-auto pt-4 border-top border-secondary" style={{ borderColor: 'var(--glass-border)' }}>
           <button
-            className="btn btn-outline-secondary fw-semibold px-4 py-2"
+            className="btn btn-outline-secondary rounded-pill px-4 fw-bold"
             onClick={handlePrevious}
             disabled={currentTopicIndex === 0}
+            style={{ borderColor: 'var(--surface-light)', color: 'var(--text-muted)' }}
           >
-            <FaArrowLeft className="me-2" />
-            {currentTopicIndex > 0 ? topics[currentTopicIndex - 1].title : "Previous"}
+            <FaArrowLeft className="me-2" /> Previous
           </button>
+          
           <button
-            className="btn btn-primary fw-semibold px-4 py-2"
+            className="btn btn-premium rounded-pill px-5"
             onClick={handleNext}
           >
-            {currentTopicIndex === topics.length - 1 ? "Finish 🎉" : `Next: ${topics[currentTopicIndex + 1]?.title || ""}`}
+            {currentTopicIndex === topics.length - 1 ? "Finish Course" : "Next Topic"}
             <FaArrowRight className="ms-2" />
           </button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Certificate Section */}
       {certificateGenerated && (
-        <div className="card bg-light p-4 rounded-4 border-0 shadow-sm">
-          <h3 className="text-success fw-bold mb-2 text-center">🎉 Congratulations!</h3>
-          <p className="text-muted text-center mb-4">
-            You have successfully completed the course. Your journey to success has just begun!
-          </p>
-          <div className="text-center">
+        <motion.div 
+          className="text-center py-5 rounded-4 position-relative overflow-hidden"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          style={{ background: 'linear-gradient(135deg, var(--surface), var(--background))', border: '1px solid var(--accent)' }}
+        >
+          <div className="position-relative z-1">
+            <div className="mb-4">
+               <FaCertificate className="text-warning display-1 drop-shadow-lg" />
+            </div>
+            <h2 className="display-6 fw-bold text-white mb-2">Congratulations!</h2>
+            <p className="text-muted fs-5 mb-4">
+              You've officially completed <span className="text-primary fw-bold">{course.title}</span>.
+            </p>
             <button
-              className="btn btn-success btn-lg fw-bold d-inline-flex align-items-center"
+              className="btn btn-premium btn-lg"
               onClick={handleDownloadCertificate}
             >
-              <FaCertificate className="me-2" />
-              Download Certificate
+              Download Your Certificate
             </button>
           </div>
-          <div className="mt-3">
-            <p className="fs-6 fst-italic text-info">
-              "Keep learning, keep growing! Your achievements are our motivation."
-            </p>
-          </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );
