@@ -16,7 +16,7 @@ const UpdateCourse = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/course/get-single-course/${id}`);
+        const response = await axios.get(`http://localhost:5000/api/course/get-single-course/${id}`);
         const { title, author, description, topics } = response.data.course;
         setTitle(title);
         setAuthor(author);
@@ -50,7 +50,7 @@ const UpdateCourse = () => {
     formData.append("topics", JSON.stringify(topics));
 
     try {
-      await axios.put(`http://localhost:8000/api/course/update-course/${id}`, formData, {
+      await axios.put(`http://localhost:5000/api/course/update-course/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       alert("Course Updated Successfully!");

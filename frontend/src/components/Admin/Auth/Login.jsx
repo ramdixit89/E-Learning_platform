@@ -4,7 +4,7 @@ import { FaUser, FaLock } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../Auth/css/login.css";
 // const BASE_URL = process.env.REACT_APP_SERVER_URL;
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'http://localhost:5000';
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
