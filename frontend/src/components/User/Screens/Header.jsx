@@ -63,12 +63,13 @@ const Header = () => {
           <Nav className="ms-auto align-items-center gap-4">
             <Nav.Link as={Link} to="/" className="text-white fw-medium hover-accent">Home</Nav.Link>
             <Nav.Link as={Link} to="/courses" className="text-white fw-medium hover-accent">Courses</Nav.Link>
+            <Nav.Link as={Link} to="/blogs" className="text-white fw-medium hover-accent">Blogs</Nav.Link>
             <Nav.Link as={Link} to="/about" className="text-white fw-medium hover-accent">About</Nav.Link>
             <Nav.Link as={Link} to="/contact" className="text-white fw-medium hover-accent">Contact</Nav.Link>
             
             {!token ? (
               <div className="d-flex gap-3 ms-lg-3">
-                <Link to="/login" className="btn text-white fw-semibold">
+                <Link to="/login" className="btn btn-outline-premium">
                   Login
                 </Link>
                 <Link to="/register" className="btn-premium">

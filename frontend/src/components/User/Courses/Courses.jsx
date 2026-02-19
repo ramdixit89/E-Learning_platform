@@ -9,6 +9,9 @@ const API_URL = import.meta.env.VITE_BASE_URL;
 const Courses = () => {
   const [courses, setCourses] = useState([]);
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+  const [level, setLevel] = useState("");
+  const [tag, setTag] = useState("");
   const [notifications] = useState([
     "🎉 New JavaScript course launched!",
     "📢 React Advanced course now live.",
@@ -27,7 +30,12 @@ const Courses = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
+        const params = {};
+        if (search) params.search = search;
+        if (level) params.level = level;
+        if (tag) params.tag = tag;
         const response = await axios.get(`${API_URL}/api/course/get-course`, {
+          params: { ...params, public: true },
           headers: {
             Authorization: localStorage.getItem("token"),
           },
@@ -37,11 +45,13 @@ const Courses = () => {
         console.error("Error fetching courses:", error);
       }
     };
-    fetchCourses();
-  }, []);
+
+    const debounce = setTimeout(fetchCourses, 350);
+    return () => clearTimeout(debounce);
+  }, [search, level, tag]);
 
   return (
-    <div className="d-flex flex-column flex-lg-row" style={{ minHeight: "100vh", paddingTop: '80px' }}>
+    <div className="d-flex flex-column flex-lg-row page" style={{ minHeight: "100vh" }}>
       {/* Main Content */}
       <div className="flex-grow-1 px-4 py-5 container">
         <div className="text-center mb-5">
@@ -51,6 +61,39 @@ const Courses = () => {
           <p className="text-muted fs-5">
             Unlock your potential with expert-led courses and free certificates.
           </p>
+        </div>
+
+        <div className="card-premium mb-5">
+          <div className="row g-3 align-items-center">
+            <div className="col-md-6">
+              <input
+                className="form-control"
+                placeholder="Search courses, topics, tags..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <div className="col-md-3">
+              <select
+                className="form-select"
+                value={level}
+                onChange={(e) => setLevel(e.target.value)}
+              >
+                <option value="">All Levels</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
+            <div className="col-md-3">
+              <input
+                className="form-control"
+                placeholder="Filter by tag"
+                value={tag}
+                onChange={(e) => setTag(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="row g-4 justify-content-center">

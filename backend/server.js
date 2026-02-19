@@ -9,6 +9,9 @@ const authRouter = require('./routes/authRoutes');
 const { forgotPassword } = require('./controllers/authController');
 const courseRoutes = require('./routes/courseRoutes');
 const completeCourse = require('./routes/completedCourseRoutes');
+const progressRoutes = require('./routes/progressRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+const blogRoutes = require('./routes/blogRoutes');
 // const postRouter = require('./routes/postRoutes');
 dotenv.config();
 const app = express();
@@ -22,13 +25,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Middleware for handling file uploads
 // app.use(fileUpload());
 app.use(fileUpload({ useTempFiles: true, tempFileDir: '/tmp/' }));
-// Custom middleware to check for file uploads
-app.use((req, res, next) => {
-  if (req.is('multipart/form-data') && (!req.files || Object.keys(req.files).length === 0)) {
-    return res.status(400).json({ message: "No files were uploaded." });
-  }
-  next();
-});
+// Allow multipart requests even when no files are attached (routes validate as needed)
 app.use('/uploads', express.static('uploads'));
 // Database connection
 dbConnection();
@@ -36,6 +33,9 @@ dbConnection();
 app.use('/auth', authRouter);
 app.use('/api/course', courseRoutes);
 app.use('/api/complete-course', completeCourse)
+app.use('/api/progress', progressRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/blogs', blogRoutes);
 // app.use('/', postRouter);
 // Start the server
 // Serve frontend

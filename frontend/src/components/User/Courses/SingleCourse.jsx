@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { FaArrowLeft, FaArrowRight, FaCertificate, FaPlayCircle } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  FaCertificate,
+  FaPlayCircle,
+  FaStar,
+} from "react-icons/fa";
 import { motion } from "framer-motion";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -12,13 +18,21 @@ const SingleCourse = () => {
   const [course, setCourse] = useState(null);
   const [currentTopicIndex, setCurrentTopicIndex] = useState(0);
   const [certificateGenerated, setCertificateGenerated] = useState(false);
+  const [completedTopics, setCompletedTopics] = useState([]);
+  const [progressLoaded, setProgressLoaded] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [ratingSummary, setRatingSummary] = useState({ averageRating: 0, reviewsCount: 0 });
+  const [reviewForm, setReviewForm] = useState({ rating: 5, comment: "" });
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
 
   const fetchCourse = async () => {
     try {
       const response = await axios.get(
         `${API_URL}/api/course/get-single-course/${id}`,
         {
-          headers: { Authorization: localStorage.getItem("token") },
+          headers: { Authorization: token },
         }
       );
       setCourse(response.data.course);
@@ -27,8 +41,52 @@ const SingleCourse = () => {
     }
   };
 
+  const fetchProgress = async () => {
+    if (!token || !userId) return;
+    try {
+      const response = await axios.get(`${API_URL}/api/progress/${id}`, {
+        headers: { Authorization: token },
+      });
+      const progress = response.data.progress;
+      setCurrentTopicIndex(progress.currentTopicIndex || 0);
+      setCompletedTopics(progress.completedTopics || []);
+      setCertificateGenerated(!!progress.isCompleted);
+      setProgressLoaded(true);
+    } catch (error) {
+      if (error?.response?.status === 404) {
+        try {
+          await axios.post(
+            `${API_URL}/api/progress/enroll`,
+            { courseId: id },
+            { headers: { Authorization: token } }
+          );
+          setProgressLoaded(true);
+        } catch (enrollError) {
+          console.error("Error enrolling course:", enrollError);
+        }
+      } else {
+        console.error("Error fetching progress:", error);
+      }
+    }
+  };
+
+  const fetchReviews = async () => {
+    try {
+      const [reviewsRes, summaryRes] = await Promise.all([
+        axios.get(`${API_URL}/api/reviews/${id}`),
+        axios.get(`${API_URL}/api/reviews/${id}/summary`),
+      ]);
+      setReviews(reviewsRes.data.reviews || []);
+      setRatingSummary(summaryRes.data);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    }
+  };
+
   useEffect(() => {
     fetchCourse();
+    fetchProgress();
+    fetchReviews();
   }, [id, certificateGenerated]);
 
   if (!course) {
@@ -42,22 +100,60 @@ const SingleCourse = () => {
   }
 
   const topics = course.topics || [];
-  const progress = ((currentTopicIndex + 1) / topics.length) * 100;
+  const progress =
+    topics.length > 0 ? (completedTopics.length / topics.length) * 100 : 0;
 
   const handleNext = async () => {
     if (currentTopicIndex < topics.length - 1) {
-      setCurrentTopicIndex((prev) => prev + 1);
+      const nextIndex = currentTopicIndex + 1;
+      const updatedCompleted = completedTopics.includes(currentTopicIndex)
+        ? completedTopics
+        : [...completedTopics, currentTopicIndex];
+      setCompletedTopics(updatedCompleted);
+      setCurrentTopicIndex(nextIndex);
+      if (progressLoaded) {
+        try {
+          await axios.patch(
+            `${API_URL}/api/progress/${course._id}`,
+            {
+              completedTopicIndex: currentTopicIndex,
+              currentTopicIndex: nextIndex,
+            },
+            { headers: { Authorization: token } }
+          );
+        } catch (error) {
+          console.error("Error updating progress:", error);
+        }
+      }
     } else {
       setCertificateGenerated(true);
+      if (!completedTopics.includes(currentTopicIndex)) {
+        setCompletedTopics([...completedTopics, currentTopicIndex]);
+      }
+      if (progressLoaded) {
+        try {
+          await axios.patch(
+            `${API_URL}/api/progress/${course._id}`,
+            {
+              completedTopicIndex: currentTopicIndex,
+              currentTopicIndex: currentTopicIndex,
+              isCompleted: true,
+            },
+            { headers: { Authorization: token } }
+          );
+        } catch (error) {
+          console.error("Error completing progress:", error);
+        }
+      }
       try {
         await axios.post(
           `${API_URL}/api/complete-course/complete`,
           {
-            userId: localStorage.getItem("userId"),
+            userId,
             courseId: course._id,
             courseTitle: course.title,
           },
-          { headers: { Authorization: localStorage.getItem("token") } }
+          { headers: { Authorization: token } }
         );
         console.log("Course marked as completed.");
       } catch (error) {
@@ -68,7 +164,17 @@ const SingleCourse = () => {
 
   const handlePrevious = () => {
     if (currentTopicIndex > 0) {
-      setCurrentTopicIndex((prev) => prev - 1);
+      const prevIndex = currentTopicIndex - 1;
+      setCurrentTopicIndex(prevIndex);
+      if (progressLoaded) {
+        axios
+          .patch(
+            `${API_URL}/api/progress/${course._id}`,
+            { currentTopicIndex: prevIndex },
+            { headers: { Authorization: token } }
+          )
+          .catch((error) => console.error("Error updating progress:", error));
+      }
     }
   };
 
@@ -81,7 +187,7 @@ const SingleCourse = () => {
           courseId: course._id,
         },
         {
-          headers: { Authorization: localStorage.getItem("token") },
+          headers: { Authorization: token },
           responseType: "blob",
         }
       );
@@ -97,8 +203,25 @@ const SingleCourse = () => {
     }
   };
 
+  const handleEmailCertificate = async () => {
+    try {
+      await axios.post(
+        `${API_URL}/api/complete-course/email-certificate`,
+        {
+          userId,
+          courseId: course._id,
+        },
+        { headers: { Authorization: token } }
+      );
+      alert("Certificate emailed successfully.");
+    } catch (error) {
+      console.error("Error emailing certificate:", error.response?.data || error);
+      alert("Failed to email certificate. Please try again later.");
+    }
+  };
+
   return (
-    <div className="container py-5" style={{ paddingTop: '100px' }}>
+    <div className="container page">
       {/* Course Header */}
       <motion.div 
         className="row align-items-center mb-5 g-5"
@@ -125,7 +248,7 @@ const SingleCourse = () => {
           <h1 className="display-5 fw-bold mb-3">{course.title}</h1>
           <p className="text-muted fs-5 mb-4" dangerouslySetInnerHTML={{ __html: course.description }}></p>
           
-          <div className="d-flex align-items-center gap-4">
+          <div className="d-flex align-items-center gap-4 flex-wrap">
             <span className="badge bg-success rounded-pill px-4 py-2 fs-6">
                {topics.length} Topics
             </span>
@@ -134,6 +257,15 @@ const SingleCourse = () => {
                  <div className="progress-bar bg-gradient-to-r from-primary to-accent" role="progressbar" style={{ width: `${progress}%`, background: 'var(--gradient-main)' }}></div>
                </div>
                <small className="text-muted">{Math.round(progress)}% Completed</small>
+            </div>
+            <div className="d-flex align-items-center gap-2">
+              <FaStar className="text-warning" />
+              <span className="text-light fw-bold">
+                {ratingSummary.averageRating || 0}
+              </span>
+              <small className="text-muted">
+                ({ratingSummary.reviewsCount || 0} reviews)
+              </small>
             </div>
           </div>
         </div>
@@ -157,6 +289,35 @@ const SingleCourse = () => {
           style={{ lineHeight: '1.8' }}
           dangerouslySetInnerHTML={{ __html: topics[currentTopicIndex]?.content }}
         ></div>
+
+        {topics[currentTopicIndex]?.videoUrl && (
+          <div className="mb-4">
+            <video
+              src={topics[currentTopicIndex].videoUrl}
+              controls
+              className="w-100 rounded-4 border border-secondary"
+            />
+          </div>
+        )}
+
+        {topics[currentTopicIndex]?.resources?.length > 0 && (
+          <div className="mb-4">
+            <h6 className="text-light mb-2">Resources</h6>
+            <div className="d-flex flex-column gap-2">
+              {topics[currentTopicIndex].resources.map((resItem, idx) => (
+                <a
+                  key={`${resItem.url}-${idx}`}
+                  href={resItem.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-decoration-none text-primary"
+                >
+                  {resItem.title || resItem.url}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
         
         {/* Navigation Buttons */}
         <div className="d-flex justify-content-between mt-auto pt-4 border-top border-secondary" style={{ borderColor: 'var(--glass-border)' }}>
@@ -195,15 +356,122 @@ const SingleCourse = () => {
             <p className="text-muted fs-5 mb-4">
               You've officially completed <span className="text-primary fw-bold">{course.title}</span>.
             </p>
-            <button
-              className="btn btn-premium btn-lg"
-              onClick={handleDownloadCertificate}
-            >
-              Download Your Certificate
-            </button>
+            <div className="d-flex flex-column flex-sm-row justify-content-center gap-3">
+              <button
+                className="btn btn-premium btn-lg"
+                onClick={handleDownloadCertificate}
+              >
+                Download Your Certificate
+              </button>
+              <button
+                className="btn btn-outline-light btn-lg"
+                onClick={handleEmailCertificate}
+              >
+                Email Me the Certificate
+              </button>
+            </div>
           </div>
         </motion.div>
       )}
+
+      {/* Reviews Section */}
+      <motion.div
+        className="card-premium mt-5"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <div className="d-flex align-items-center justify-content-between mb-3">
+          <h3 className="fw-bold mb-0 text-light">Learner Reviews</h3>
+          <div className="d-flex align-items-center gap-2">
+            <FaStar className="text-warning" />
+            <span className="text-light fw-bold">
+              {ratingSummary.averageRating || 0}
+            </span>
+            <small className="text-muted">
+              ({ratingSummary.reviewsCount || 0})
+            </small>
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label className="form-label text-light">Your Rating</label>
+          <div className="d-flex align-items-center gap-2 mb-3">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                className="btn btn-sm btn-outline-secondary"
+                onClick={() =>
+                  setReviewForm((prev) => ({ ...prev, rating: star }))
+                }
+              >
+                <FaStar className={star <= reviewForm.rating ? "text-warning" : "text-muted"} />
+              </button>
+            ))}
+          </div>
+          <textarea
+            className="form-control mb-3"
+            rows="3"
+            placeholder="Share what you liked or what could improve..."
+            value={reviewForm.comment}
+            onChange={(e) =>
+              setReviewForm((prev) => ({ ...prev, comment: e.target.value }))
+            }
+          />
+          <button
+            className="btn btn-premium"
+            disabled={reviewSubmitting}
+            onClick={async () => {
+              if (!token) return;
+              setReviewSubmitting(true);
+              try {
+                await axios.post(
+                  `${API_URL}/api/reviews/${course._id}`,
+                  reviewForm,
+                  { headers: { Authorization: token } }
+                );
+                setReviewForm({ rating: reviewForm.rating, comment: "" });
+                await fetchReviews();
+              } catch (error) {
+                console.error("Error submitting review:", error);
+              } finally {
+                setReviewSubmitting(false);
+              }
+            }}
+          >
+            {reviewSubmitting ? "Submitting..." : "Submit Review"}
+          </button>
+        </div>
+
+        <div className="d-flex flex-column gap-3">
+          {reviews.length > 0 ? (
+            reviews.map((review) => (
+              <div
+                key={review._id}
+                className="p-3 rounded-3 border border-secondary"
+                style={{ borderColor: "var(--glass-border)" }}
+              >
+                <div className="d-flex align-items-center justify-content-between mb-2">
+                  <div className="text-light fw-bold">
+                    {review.userId?.username || "Learner"}
+                  </div>
+                  <div className="d-flex align-items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <FaStar
+                        key={`${review._id}-${star}`}
+                        className={star <= review.rating ? "text-warning" : "text-muted"}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="text-muted">{review.comment || "No comment"}</div>
+              </div>
+            ))
+          ) : (
+            <div className="text-muted">No reviews yet. Be the first to share.</div>
+          )}
+        </div>
+      </motion.div>
     </div>
   );
 };

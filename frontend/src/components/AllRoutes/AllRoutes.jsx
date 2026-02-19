@@ -9,12 +9,18 @@ import AddCourse from "../Admin/Dashboard/AddCourse";
 import AllCourse from "../Admin/Dashboard/AllCourse";
 import Users from "../Admin/Dashboard/Users";
 import UpdateCourse from "../Admin/Dashboard/UpdateCourse";
+import AddBlog from "../Admin/Dashboard/AddBlog";
+import AllBlogs from "../Admin/Dashboard/AllBlogs";
+import EditBlog from "../Admin/Dashboard/EditBlog";
 import WithOutLayout from "../User/WithoutLayout/WithOutLayout";
 import Register from "../User/Auth/Register";
 import ForgotPassword from "../User/Auth/ForgotPassword";
 import HomePage from "../User/Screens/HomePage";
 import Courses from "../User/Courses/Courses";
 import SingleCourse from "../User/Courses/SingleCourse";
+import Blogs from "../User/Blog/Blogs";
+import BlogDetails from "../User/Blog/BlogDetails";
+import WriteBlog from "../User/Blog/WriteBlog";
 import About from "../User/Screens/About";
 import Contact from "../User/Screens/Contact";
 import Certificate from "../User/Screens/Certificate";
@@ -64,6 +70,30 @@ const AllRoutes = () => {
             </Layout>
           }
         />
+        <Route
+          path="/admin/add-blog"
+          element={
+            <Layout>
+              <AddBlog />
+            </Layout>
+          }
+        />
+        <Route
+          path="/admin/all-blogs"
+          element={
+            <Layout>
+              <AllBlogs />
+            </Layout>
+          }
+        />
+        <Route
+          path="/admin/edit-blog/:id"
+          element={
+            <Layout>
+              <EditBlog />
+            </Layout>
+          }
+        />
 
         {/* user routes */}
         <Route
@@ -103,6 +133,30 @@ const AllRoutes = () => {
           element={
             <UserLayout>
               <Courses/>
+            </UserLayout>
+          }
+        />
+        <Route
+          path="/blogs"
+          element={
+            <UserLayout>
+              <Blogs/>
+            </UserLayout>
+          }
+        />
+        <Route
+          path="/blogs/write"
+          element={
+            <UserLayout>
+              <WriteBlog/>
+            </UserLayout>
+          }
+        />
+        <Route
+          path="/blogs/:id"
+          element={
+            <UserLayout>
+              <BlogDetails/>
             </UserLayout>
           }
         />

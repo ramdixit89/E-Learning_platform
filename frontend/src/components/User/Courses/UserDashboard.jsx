@@ -15,6 +15,7 @@ const API_URL = import.meta.env.VITE_BASE_URL;
 const UserDashboard = () => {
   const [user, setUser] = useState(null);
   const [completedCourses, setCompletedCourses] = useState([]);
+  const [inProgressCourses, setInProgressCourses] = useState([]);
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
 
@@ -41,6 +42,17 @@ const UserDashboard = () => {
         );
     }
   }, [userId, token]);
+
+  useEffect(() => {
+    if (token) {
+      axios
+        .get(`${API_URL}/api/progress/my`, {
+          headers: { Authorization: token },
+        })
+        .then((res) => setInProgressCourses(res.data.progress || []))
+        .catch((err) => console.error("Error fetching progress:", err));
+    }
+  }, [token]);
 
   const handleDownloadCertificate = async (courseId, courseTitle) => {
     try {
@@ -69,6 +81,20 @@ const UserDashboard = () => {
     }
   };
 
+  const handleEmailCertificate = async (courseId, courseTitle) => {
+    try {
+      await axios.post(
+        `${API_URL}/api/complete-course/email-certificate`,
+        { userId, courseId },
+        { headers: { Authorization: token } }
+      );
+      alert(`Certificate for ${courseTitle} emailed successfully.`);
+    } catch (error) {
+      console.error("Certificate email failed:", error?.response?.data || error);
+      alert("Failed to email certificate. Please try again later.");
+    }
+  };
+
   if (!user) return (
      <div className="text-center py-5 d-flex align-items-center justify-content-center" style={{ minHeight: '80vh', color: 'var(--text-main)' }}>
         <h3>Loading your profile...</h3>
@@ -76,7 +102,7 @@ const UserDashboard = () => {
   );
 
   return (
-    <div className="container py-5" style={{ paddingTop: '100px' }}>
+    <div className="container page">
       {/* Profile Header */}
       <motion.div 
         className="card-premium p-5 mb-5 d-flex flex-column flex-md-row align-items-center gap-4"
@@ -110,6 +136,65 @@ const UserDashboard = () => {
       >
         <div className="d-flex align-items-center justify-content-between mb-4">
           <h3 className="fw-bold mb-0 text-light">
+            Continue <span className="text-gradient">Learning</span>
+          </h3>
+          <span className="text-muted">{inProgressCourses.length} Active</span>
+        </div>
+
+        <div className="row g-4 mb-5">
+          {inProgressCourses.length > 0 ? (
+            inProgressCourses.map((item) => (
+              <div key={item._id} className="col-md-6 col-lg-4">
+                <div className="card-premium h-100 p-4 d-flex flex-column">
+                  <div className="d-flex align-items-center gap-3 mb-3">
+                    <img
+                      src={item.courseId?.thumbnail}
+                      alt={item.courseId?.title}
+                      className="rounded-3"
+                      style={{ width: 60, height: 60, objectFit: "cover" }}
+                    />
+                    <div>
+                      <h6 className="fw-bold text-light mb-1">
+                        {item.courseId?.title || "Course"}
+                      </h6>
+                      <p className="text-muted small mb-0">
+                        {item.courseId?.level || "beginner"} level
+                      </p>
+                    </div>
+                  </div>
+                  <div className="progress mb-3" style={{ height: 8 }}>
+                    <div
+                      className="progress-bar"
+                      style={{
+                        width: item.courseId?.topics?.length
+                          ? `${Math.round(
+                              (item.completedTopics.length /
+                                item.courseId.topics.length) *
+                                100
+                            )}%`
+                          : "0%",
+                        background: "var(--gradient-main)",
+                      }}
+                    ></div>
+                  </div>
+                  <a
+                    href={`/courses/${item.courseId?._id}`}
+                    className="btn btn-outline-premium btn-sm mt-auto w-100"
+                  >
+                    Resume Course
+                  </a>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="col-12 py-3 text-center text-muted">
+              Start a course to see progress here.
+            </div>
+          )}
+        </div>
+
+        <div className="d-flex align-items-center justify-content-between mb-4">
+          <h3 className="fw-bold mb-0 text-light">
              Your <span className="text-gradient">Certificates</span>
           </h3>
           <span className="text-muted">{completedCourses.length} Earned</span>
@@ -135,6 +220,14 @@ const UserDashboard = () => {
                   >
                     <FaCertificate className="me-2" />
                     Download PDF
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleEmailCertificate(course.courseId, course.courseTitle)
+                    }
+                    className="btn btn-premium btn-sm mt-2 w-100"
+                  >
+                    Email Certificate
                   </button>
                 </div>
               </div>

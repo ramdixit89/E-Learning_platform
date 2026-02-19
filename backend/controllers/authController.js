@@ -164,4 +164,32 @@ const getSingleUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, forgotPassword, resetPassword, getAllUsers, getSingleUser };
+// 🔹 Update User Role (Admin Only)
+const updateUserRole = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { role } = req.body;
+    const allowedRoles = ["admin", "instructor", "user"];
+
+    if (!role || !allowedRoles.includes(role)) {
+      return res.status(400).json({ message: "Invalid role" });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { role },
+      { new: true, select: "-password -otp -resetTokenExpiry" }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ message: "Role updated successfully", user });
+  } catch (error) {
+    console.error("Error updating role:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports = { registerUser, loginUser, forgotPassword, resetPassword, getAllUsers, getSingleUser, updateUserRole };

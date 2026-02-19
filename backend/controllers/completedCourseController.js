@@ -1,6 +1,8 @@
 const CompletedCourse = require('../models/completedCourse');
 const generateCertificate = require("../utils/generateCertificate");
 const User = require("../models/userModel");
+const nodemailer = require("nodemailer");
+const path = require("path");
 // Add a completed course
 exports.addCompletedCourse = async (req, res) => {
   try {
@@ -69,5 +71,48 @@ exports.generateCertificate = async (req, res) => {
   } catch (error) {
     console.error("Certificate generation error:", error);
     res.status(500).json({ error: "Failed to generate certificate." });
+  }
+};
+
+// Email certificate
+exports.emailCertificate = async (req, res) => {
+  try {
+    const { userId, courseId } = req.body;
+
+    const user = await User.findById(userId).select("username email");
+    const course = await CompletedCourse.findOne({ userId, courseId }).select("courseTitle");
+
+    if (!user || !course) {
+      return res.status(404).json({ message: "User or course not found." });
+    }
+
+    const certPath = await generateCertificate({
+      username: user.username,
+      courseTitle: course.courseTitle,
+      userId,
+      courseId,
+    });
+
+    const transporter = nodemailer.createTransport({
+      service: process.env.EMAIL_SERVICE || "Gmail",
+      auth: { user: process.env.EMAIL, pass: process.env.PASSWORD },
+    });
+
+    await transporter.sendMail({
+      to: user.email,
+      subject: `Your RDCoders Certificate - ${course.courseTitle}`,
+      text: `Hi ${user.username},\n\nCongratulations on completing "${course.courseTitle}"! Your certificate is attached.\n\nKeep learning,\nRDCoders Team`,
+      attachments: [
+        {
+          filename: `${course.courseTitle}_certificate.pdf`,
+          path: path.resolve(certPath),
+        },
+      ],
+    });
+
+    res.status(200).json({ message: "Certificate emailed successfully." });
+  } catch (error) {
+    console.error("Email certificate error:", error);
+    res.status(500).json({ error: "Failed to send certificate email." });
   }
 };

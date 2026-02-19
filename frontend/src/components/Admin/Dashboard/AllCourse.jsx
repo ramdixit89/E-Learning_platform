@@ -37,6 +37,26 @@ const AllCourse = () => {
   const handleUpdate = (id) => {
     navigate(`/admin/edit-course/${id}`);
   };
+
+  const toggleStatus = async (course) => {
+    try {
+      const formData = new FormData();
+      formData.append("status", course.status === "published" ? "draft" : "published");
+      await axios.put(`http://localhost:5000/api/course/update-course/${course._id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setCourses((prev) =>
+        prev.map((item) =>
+          item._id === course._id
+            ? { ...item, status: course.status === "published" ? "draft" : "published" }
+            : item
+        )
+      );
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Failed to update status");
+    }
+  };
   return (
     <div className="container mt-4">
       <h2 className="mb-3">All Courses</h2>
@@ -50,12 +70,21 @@ const AllCourse = () => {
                 <p className="card-text">
                   <strong>Author:</strong> {course.author}
                 </p>
+                <p className="card-text">
+                  <strong>Status:</strong>{" "}
+                  <span className={course.status === "published" ? "text-success" : "text-warning"}>
+                    {course.status || "draft"}
+                  </span>
+                </p>
                 <p className="text-muted">
                   <small>Uploaded At: {new Date(course.createdAt).toLocaleDateString()}</small>
                 </p>
                 <div className="d-flex justify-content-between">
                   <button className="btn btn-primary btn-sm" onClick={() => handleUpdate(course._id)}>Update</button>
                   <button className="btn btn-warning btn-sm">Read</button>
+                  <button className="btn btn-outline-secondary btn-sm" onClick={() => toggleStatus(course)}>
+                    {course.status === "published" ? "Unpublish" : "Publish"}
+                  </button>
                   <button className="btn btn-danger btn-sm" onClick={() => handleDelete(course._id)}>Delete</button>
                 </div>
               </div>
