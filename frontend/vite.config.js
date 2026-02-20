@@ -3,9 +3,6 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  build: {
-    outDir: "build",
-  },
   server: {
     historyApiFallback: true, // Ensures React Router works correctly
   },
