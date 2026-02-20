@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { motion } from "framer-motion";
 import "bootstrap/dist/css/bootstrap.min.css";
+import RichContent from "../Common/RichContent";
 
 const API_URL = import.meta.env.VITE_BASE_URL;
 
@@ -246,7 +247,7 @@ const SingleCourse = () => {
              Course
           </div>
           <h1 className="display-5 fw-bold mb-3">{course.title}</h1>
-          <p className="text-muted fs-5 mb-4" dangerouslySetInnerHTML={{ __html: course.description }}></p>
+           <RichContent html={course.description} className="text-muted mb-4" />
           
           <div className="d-flex align-items-center gap-4 flex-wrap">
             <span className="badge bg-success rounded-pill px-4 py-2 fs-6">
@@ -284,11 +285,7 @@ const SingleCourse = () => {
           </h3>
         </div>
         
-        <div
-          className="px-2 text-muted fw-light fs-5 mb-5"
-          style={{ lineHeight: '1.8' }}
-          dangerouslySetInnerHTML={{ __html: topics[currentTopicIndex]?.content }}
-        ></div>
+        <RichContent html={topics[currentTopicIndex]?.content || ""} />
 
         {topics[currentTopicIndex]?.videoUrl && (
           <div className="mb-4">

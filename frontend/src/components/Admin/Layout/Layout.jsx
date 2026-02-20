@@ -1,21 +1,24 @@
 import React from "react";
-import Header from "../Header/Header";
-import Footer from "../Footer/Footer";
 import SideBar from "../SideBar/SideBar";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./Layout.css";
+import { ToastProvider } from "../../User/Common/Toast";
 
-const Layout = ({ children }) => {
+const AdminLayout = ({ children }) => {
   return (
-    <div className="dashboard">
-      <Header />
-      <div className="d-flex flex-grow-1">
+    <ToastProvider>
+      <div style={{
+        display: "flex", minHeight: "100vh",
+        background: "var(--bg)", color: "var(--text)",
+      }}>
         <SideBar />
-        <div className="main-content w-100">{children}</div>
+        <div style={{
+          flex: 1, minWidth: 0, overflowX: "hidden",
+          background: "var(--bg)",
+        }}>
+          {children}
+        </div>
       </div>
-      <Footer />
-    </div>
+    </ToastProvider>
   );
 };
 
-export default Layout;
+export default AdminLayout;
