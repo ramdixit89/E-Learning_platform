@@ -12,7 +12,7 @@ const Header = () => {
     <header
       className="d-flex justify-content-between align-items-center p-3 shadow-sm"
       style={{
-        background: "linear-gradient(to right, #1E3A5F, #23395B)",
+        background: "linear-gradient(135deg, #0f766e 0%, #111824 100%)",
         color: "white",
         boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.15)",
       }}

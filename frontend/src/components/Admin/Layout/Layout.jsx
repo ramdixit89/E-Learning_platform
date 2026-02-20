@@ -3,14 +3,15 @@ import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
 import SideBar from "../SideBar/SideBar";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./Layout.css";
 
 const Layout = ({ children }) => {
   return (
-    <div className="d-flex flex-column min-vh-100">
+    <div className="dashboard">
       <Header />
       <div className="d-flex flex-grow-1">
         <SideBar />
-        <div className="p-4 w-100">{children}</div>
+        <div className="main-content w-100">{children}</div>
       </div>
       <Footer />
     </div>

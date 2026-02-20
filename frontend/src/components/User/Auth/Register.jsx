@@ -51,11 +51,11 @@ const Register = () => {
   };
 
   return (
-    <div className="container mt-5">
+    <div className="container page">
       <div className="row justify-content-center">
         <div className="col-md-6">
-          <div className="card shadow p-4">
-            <h2 className="text-center mb-4">Register</h2>
+          <div className="card-premium p-4">
+            <h2 className="text-center mb-4 section-title">Create Account</h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-3 input-group">
                 <span className="input-group-text"><FaUser /></span>

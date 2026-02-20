@@ -1,6 +1,6 @@
 const express = require("express");
 const completeCourse = express.Router();
-const { addCompletedCourse, getCompletedCourses, generateCertificate } = require("../controllers/completedCourseController");
+const { addCompletedCourse, getCompletedCourses, generateCertificate, emailCertificate } = require("../controllers/completedCourseController");
 const { verifyToken } = require("../middleware/authMiddleware");
 
 // Mark course as completed
@@ -10,4 +10,6 @@ completeCourse.post("/complete", verifyToken, addCompletedCourse);
 completeCourse.get("/completed/:userId", verifyToken, getCompletedCourses);
 // Generate certificate
 completeCourse.post("/generate-certificate", verifyToken, generateCertificate);
+// Email certificate
+completeCourse.post("/email-certificate", verifyToken, emailCertificate);
 module.exports = completeCourse;

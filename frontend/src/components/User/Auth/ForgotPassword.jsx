@@ -18,11 +18,11 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="container mt-5">
+    <div className="container page">
       <div className="row justify-content-center">
         <div className="col-md-6">
-          <div className="card shadow p-4">
-            <h2 className="text-center mb-4">Forgot Password</h2>
+          <div className="card-premium p-4">
+            <h2 className="text-center mb-4 section-title">Forgot Password</h2>
             <p className="text-center text-muted">
               Enter your email address to receive a password reset link.
             </p>

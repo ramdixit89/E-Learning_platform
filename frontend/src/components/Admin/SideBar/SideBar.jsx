@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Modal, Button } from "react-bootstrap";
-import { FaBars, FaTimes, FaHome, FaBook, FaUser, FaCog } from "react-icons/fa";
+import { FaBars, FaTimes, FaHome, FaBook, FaUser, FaCog, FaPenNib } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const SideBar = () => {
@@ -66,6 +66,26 @@ const SideBarContent = ({ closeSidebar }) => (
           onClick={closeSidebar}
         >
           <FaBook className="me-2 text-warning" /> All courses
+        </Link>
+      </li>
+      <li className="mb-3">
+        <Link
+          to="/admin/add-blog"
+          className="text-white text-decoration-none d-flex align-items-center p-2 rounded"
+          style={{ backgroundColor: "#334155" }}
+          onClick={closeSidebar}
+        >
+          <FaPenNib className="me-2 text-warning" /> Add Blog
+        </Link>
+      </li>
+      <li className="mb-3">
+        <Link
+          to="/admin/all-blogs"
+          className="text-white text-decoration-none d-flex align-items-center p-2 rounded"
+          style={{ backgroundColor: "#334155" }}
+          onClick={closeSidebar}
+        >
+          <FaPenNib className="me-2 text-warning" /> All Blogs
         </Link>
       </li>
       <li className="mb-3">

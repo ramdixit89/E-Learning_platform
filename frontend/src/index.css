@@ -1,27 +1,28 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Sora:wght@400;600;700&display=swap");
+
 :root {
-  --primary: #6366f1;
-  --primary-dark: #4f46e5;
-  --secondary: #ec4899;
-  --accent: #8b5cf6;
-  --background: #0f172a;
-  --surface: #1e293b;
-  --surface-light: #334155;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --success: #10b981;
+  --primary: #0f766e;
+  --primary-dark: #0b5d57;
+  --secondary: #f59e0b;
+  --accent: #14b8a6;
+  --background: #0b0f14;
+  --surface: #111824;
+  --surface-light: #1a2533;
+  --text-main: #f2f5f7;
+  --text-muted: #a7b0bb;
+  --success: #16a34a;
   --warning: #f59e0b;
   --danger: #ef4444;
-  --font-heading: "Outfit", sans-serif;
-  --font-body: "Inter", sans-serif;
-  --gradient-main: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  --gradient-text: linear-gradient(to right, #818cf8, #c084fc, #f472b6);
-  --glass: rgba(30, 41, 59, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg:
-    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-neon: 0 0 20px rgba(99, 102, 241, 0.3);
+  --font-heading: "Sora", sans-serif;
+  --font-body: "Manrope", sans-serif;
+  --gradient-main: linear-gradient(135deg, #0f766e 0%, #14b8a6 60%, #f59e0b 120%);
+  --gradient-text: linear-gradient(90deg, #5eead4, #22d3ee, #f59e0b);
+  --glass: rgba(17, 24, 36, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.2);
+  --shadow-md: 0 10px 25px -15px rgb(0 0 0 / 0.65);
+  --shadow-lg: 0 20px 40px -25px rgb(0 0 0 / 0.75);
+  --shadow-neon: 0 0 24px rgba(20, 184, 166, 0.25);
 }
 
 * {
@@ -32,7 +33,10 @@
 
 body {
   font-family: var(--font-body);
-  background-color: var(--background);
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(20, 184, 166, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 90% 10%, rgba(245, 158, 11, 0.12), transparent 60%),
+    var(--background);
   color: var(--text-main);
   line-height: 1.6;
   overflow-x: hidden;
@@ -100,12 +104,25 @@ ul {
 .form-control:focus {
   background-color: var(--surface);
   color: var(--text-main);
-  border-color: var(--primary);
-  box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.25rem rgba(20, 184, 166, 0.25);
 }
 
 .form-control::placeholder {
   color: var(--text-muted);
+}
+
+/* Jodit Editor (ensure readable text in dark UI) */
+.jodit-container,
+.jodit-workplace,
+.jodit-wysiwyg {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+
+.jodit-toolbar__box {
+  background-color: #f8fafc !important;
+  color: #111827 !important;
 }
 
 
@@ -134,14 +151,14 @@ ul {
   box-shadow:
     0 20px 25px -5px rgb(0 0 0 / 0.1),
     0 8px 10px -6px rgb(0 0 0 / 0.1),
-    0 0 30px rgba(99, 102, 241, 0.5);
+    0 0 30px rgba(20, 184, 166, 0.45);
   color: white;
 }
 
 .btn-outline-premium {
   background: transparent;
-  border: 2px solid var(--primary);
-  color: var(--primary);
+  border: 2px solid var(--accent);
+  color: var(--accent);
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
   font-weight: 600;
@@ -149,7 +166,7 @@ ul {
 }
 
 .btn-outline-premium:hover {
-  background: var(--primary);
+  background: var(--accent);
   color: white;
   box-shadow: var(--shadow-neon);
 }
@@ -180,7 +197,7 @@ ul {
 .card-premium:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow-lg), var(--shadow-neon);
-  border-color: var(--primary);
+  border-color: var(--accent);
 }
 
 .card-premium:hover::before {
@@ -206,7 +223,7 @@ ul {
 }
 
 .swal2-confirm {
-  background: var(--primary) !important;
+  background: var(--accent) !important;
 }
 
 .swal2-cancel {
@@ -270,5 +287,96 @@ ul {
   border-radius: 5px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+  background: var(--accent);
+}
+
+/* Layout helpers */
+.page {
+  padding-top: 100px;
+  padding-bottom: 60px;
+}
+
+.section {
+  padding-top: 60px;
+  padding-bottom: 60px;
+}
+
+.section-title {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+}
+
+.surface-panel {
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+}
+
+/* Form styling for premium feel */
+.form-control,
+.form-select,
+textarea.form-control {
+  background-color: var(--surface);
+  border-color: var(--glass-border);
+  color: var(--text-main);
+}
+
+.form-control::placeholder,
+.form-select::placeholder,
+textarea.form-control::placeholder {
+  color: var(--text-muted);
+}
+
+.form-select {
+  background-color: var(--surface);
+  color: var(--text-main);
+}
+
+.form-label {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Buttons */
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0b0f14;
+  font-weight: 700;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background: #19c7b3;
+  border-color: #19c7b3;
+  color: #0b0f14;
+}
+
+.btn-outline-secondary {
+  border-color: var(--glass-border);
+  color: var(--text-muted);
+}
+
+/* Cards and tables */
+.table {
+  color: var(--text-main);
+}
+
+.table thead th {
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+/* Jodit Editor (ensure readable text in dark UI) */
+.jodit-container,
+.jodit-workplace,
+.jodit-wysiwyg {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+
+.jodit-toolbar__box {
+  background-color: #f8fafc !important;
+  color: #111827 !important;
 }
