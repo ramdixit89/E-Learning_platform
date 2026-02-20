@@ -45,7 +45,6 @@ const SidebarContent = ({ closeSidebar }) => {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", padding: "1.5rem 1rem" }}>
-      {/* Logo */}
       <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", marginBottom: "2rem", paddingBottom: "1.25rem", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
         <div style={{
           width: 36, height: 36, borderRadius: 9,
