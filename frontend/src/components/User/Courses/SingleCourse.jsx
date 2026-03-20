@@ -105,6 +105,7 @@ const SingleCourse = () => {
     topics.length > 0 ? (completedTopics.length / topics.length) * 100 : 0;
 
   const handleNext = async () => {
+    window.scrollTo({ top: 0, behavior: "smooth" }); // <-- Add smooth scroll to top
     if (currentTopicIndex < topics.length - 1) {
       const nextIndex = currentTopicIndex + 1;
       const updatedCompleted = completedTopics.includes(currentTopicIndex)
@@ -164,6 +165,7 @@ const SingleCourse = () => {
   };
 
   const handlePrevious = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" }); // <-- Add smooth scroll to top
     if (currentTopicIndex > 0) {
       const prevIndex = currentTopicIndex - 1;
       setCurrentTopicIndex(prevIndex);
@@ -318,22 +320,30 @@ const SingleCourse = () => {
         
         {/* Navigation Buttons */}
         <div className="d-flex justify-content-between mt-auto pt-4 border-top border-secondary" style={{ borderColor: 'var(--glass-border)' }}>
-          <button
-            className="btn btn-outline-secondary rounded-pill px-4 fw-bold"
-            onClick={handlePrevious}
-            disabled={currentTopicIndex === 0}
-            style={{ borderColor: 'var(--surface-light)', color: 'var(--text-muted)' }}
-          >
-            <FaArrowLeft className="me-2" /> Previous
-          </button>
+          <div className="d-flex flex-column align-items-start">
+            <button
+              className="btn btn-outline-secondary rounded-pill px-4 fw-bold"
+              onClick={handlePrevious}
+              disabled={currentTopicIndex === 0}
+              style={{ borderColor: 'var(--surface-light)', color: 'var(--text-muted)' }}
+            >
+              <FaArrowLeft className="me-2" /> Previous
+            </button>
+          </div>
           
-          <button
-            className="btn btn-premium rounded-pill px-5"
-            onClick={handleNext}
-          >
-            {currentTopicIndex === topics.length - 1 ? "Finish Course" : "Next Topic"}
-            <FaArrowRight className="ms-2" />
-          </button>
+          <div className="d-flex flex-column align-items-end">
+            <button
+              className="btn btn-outline-secondary rounded-pill px-5 mb-2"
+              onClick={handleNext}
+            >
+              {currentTopicIndex === topics.length - 1 ? "Finish Course" : "Next Topic"}
+              <FaArrowRight className="ms-2" />
+            </button>
+            {/* Next topic name */}
+            {currentTopicIndex < topics.length - 1 && (
+              <small className="text-muted fst-italic">Up next: {topics[currentTopicIndex + 1]?.title}</small>
+            )}
+          </div>
         </div>
       </motion.div>
 
@@ -355,7 +365,7 @@ const SingleCourse = () => {
             </p>
             <div className="d-flex flex-column flex-sm-row justify-content-center gap-3">
               <button
-                className="btn btn-premium btn-lg"
+                className="btn btn-primary btn-lg"
                 onClick={handleDownloadCertificate}
               >
                 Download Your Certificate
@@ -416,7 +426,7 @@ const SingleCourse = () => {
             }
           />
           <button
-            className="btn btn-premium"
+            className="btn btn-warning"
             disabled={reviewSubmitting}
             onClick={async () => {
               if (!token) return;

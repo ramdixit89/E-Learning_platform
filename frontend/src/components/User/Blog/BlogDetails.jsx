@@ -40,6 +40,7 @@ const BlogDetails = () => {
       try {
         const response = await axios.get(`${API_URL}/api/blogs/${id}`);
         setBlog(response.data.blog);
+        window.scrollTo({ top: 0, behavior: "instant" }); // <--- Ensure it starts at top immediately
       } catch (error) {
         console.error("Error fetching blog:", error);
       } finally {

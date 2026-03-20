@@ -1,82 +1,107 @@
 import React from "react";
-import { FaEnvelope, FaMapMarkerAlt, FaPhone } from "react-icons/fa";
+import { FaEnvelope, FaMapMarkerAlt, FaPhone, FaPaperPlane } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 const Contact = () => {
   return (
-    <div className="container page text-center">
-      <motion.div
-         initial={{ opacity: 0, scale: 0.95 }}
-         animate={{ opacity: 1, scale: 1 }}
-         transition={{ duration: 0.5 }}
-      >
-        <h2 className="fw-bold mb-5 display-5">
-          Get In <span className="text-gradient">Touch</span>
-        </h2>
-      </motion.div>
-
-      <div className="row justify-content-center g-4">
-        {[
-          {
-            icon: <FaMapMarkerAlt className="text-danger fs-2" />,
-            title: "Visit Us",
-            text: "Indore, India",
-          },
-          {
-            icon: <FaEnvelope className="text-primary fs-2" />,
-            title: "Email Us",
-            text: "contact@rdcoders.com",
-          },
-          {
-            icon: <FaPhone className="text-success fs-2" />,
-            title: "Call Us",
-            text: "+91 98765 43210",
-          },
-        ].map((contact, index) => (
-          <motion.div 
-            className="col-md-4" 
-            key={index}
-            initial={{ opacity: 0, y: 30 }}
+    <div className="page section-gap">
+      <div className="container-tight">
+        <div className="text-center mb-5">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.15 }}
+            transition={{ duration: 0.5 }}
           >
-            <div className="card-premium h-100 p-4 d-flex flex-column align-items-center">
-              <div className="mb-3 p-3 rounded-circle bg-dark border border-secondary">
-                 {contact.icon}
-              </div>
-              <h5 className="fw-bold text-muted mb-1">{contact.title}</h5>
-              <h4 className="fw-bold text-light">{contact.text}</h4>
+             <div className="hero-badge mx-auto">
+              <span className="dot"></span>
+              Support
             </div>
+            <h1 className="hero-title mb-3">
+              Get In <span className="text-gradient">Touch</span>
+            </h1>
+            <p className="hero-sub mx-auto">
+              Have questions about our courses or need technical support? 
+              Our team is here to help you on your learning journey.
+            </p>
           </motion.div>
-        ))}
-      </div>
-      
-      {/* Contact Form Placeholder */}
-      <div className="row justify-content-center mt-5">
-        <div className="col-md-8">
-           <div className="card-premium p-5 text-start">
-              <h4 className="fw-bold text-light mb-4 text-center">Send us a message</h4>
-              <form>
-                 <div className="row g-3">
-                    <div className="col-md-6">
-                       <label className="text-muted small">Name</label>
-                       <input type="text" className="form-control bg-dark border-secondary text-light" placeholder="John Doe" style={{ background: 'var(--background)' }} />
-                    </div>
-                    <div className="col-md-6">
-                       <label className="text-muted small">Email</label>
-                       <input type="email" className="form-control bg-dark border-secondary text-light" placeholder="john@example.com" style={{ background: 'var(--background)' }} />
-                    </div>
-                    <div className="col-12">
-                       <label className="text-muted small">Message</label>
-                       <textarea className="form-control bg-dark border-secondary text-light" rows="4" placeholder="How can we help you?" style={{ background: 'var(--background)' }}></textarea>
-                    </div>
-                    <div className="col-12 text-center mt-3">
-                       <button className="btn btn-premium px-5">Send Message</button>
-                    </div>
-                 </div>
-              </form>
-           </div>
         </div>
+
+        <div className="row g-4 mb-5">
+          {[
+            {
+              icon: <FaMapMarkerAlt />,
+              title: "Visit Us",
+              text: "Indore, India",
+              colorWrapper: "indigo"
+            },
+            {
+              icon: <FaEnvelope />,
+              title: "Email Us",
+              text: "contact@rdcoders.com",
+              colorWrapper: "cyan"
+            },
+            {
+              icon: <FaPhone />,
+              title: "Call Us",
+              text: "+91 98765 43210",
+              colorWrapper: "green"
+            },
+          ].map((contact, index) => (
+            <div className="col-md-4" key={index}>
+              <motion.div 
+                className="card-glass h-100 p-4 text-center d-flex flex-column align-items-center"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.15 }}
+              >
+                <div className={`feature-icon ${contact.colorWrapper} mb-3`} style={{ width: 60, height: 60, fontSize: "1.5rem" }}>
+                   {contact.icon}
+                </div>
+                <h5 className="font-display fw-bold mb-1" style={{ fontSize: "1.1rem" }}>{contact.title}</h5>
+                <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", margin: 0 }}>{contact.text}</p>
+              </motion.div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Contact Form Placeholder */}
+        <motion.div 
+          className="row justify-content-center"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <div className="col-md-10">
+             <div className="card-glow p-4 p-md-5">
+                <h3 className="font-display fw-bold mb-4 text-center">Send us a message</h3>
+                <form>
+                   <div className="row g-4">
+                      <div className="col-md-6">
+                         <label className="form-label-custom">First Name</label>
+                         <input type="text" className="input-field" placeholder="John" />
+                      </div>
+                      <div className="col-md-6">
+                         <label className="form-label-custom">Last Name</label>
+                         <input type="text" className="input-field" placeholder="Doe" />
+                      </div>
+                      <div className="col-12">
+                         <label className="form-label-custom">Email Address</label>
+                         <input type="email" className="input-field" placeholder="john@example.com" />
+                      </div>
+                      <div className="col-12">
+                         <label className="form-label-custom">Message</label>
+                         <textarea className="input-field" rows="5" placeholder="How can we help you?"></textarea>
+                      </div>
+                      <div className="col-12 text-center mt-4">
+                         <button type="button" className="btn-primary-custom px-5 py-3">
+                           <FaPaperPlane /> Send Message
+                         </button>
+                      </div>
+                   </div>
+                </form>
+             </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

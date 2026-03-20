@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ScrollToTop from "../Common/ScrollToTop";
 import Login from "../Admin/Auth/Login";
 import UserLogin from "../User/Auth/Login";
 import WithoutLay from "../Admin/WithoutLayout/WithoutLay";
@@ -26,9 +27,11 @@ import Contact from "../User/Screens/Contact";
 import Certificate from "../User/Screens/Certificate";
 import UserDashboard from "../User/Courses/UserDashboard";
 import ErrorPage from "../User/Screens/ErrorPage";
+
 const AllRoutes = () => {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route
           path="/admin"
