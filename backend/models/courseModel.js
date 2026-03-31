@@ -64,5 +64,9 @@ const courseSchema = new mongoose.Schema({
   },
 });
 
+courseSchema.index({ status: 1, createdAt: -1 });
+courseSchema.index({ level: 1 });
+courseSchema.index({ tags: 1 });
+
 const Course = mongoose.model("Course", courseSchema);
 module.exports = Course;

@@ -1,215 +1,229 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from "../Common/ScrollToTop";
-import Login from "../Admin/Auth/Login";
-import UserLogin from "../User/Auth/Login";
+
+// Layouts - static imports
 import WithoutLay from "../Admin/WithoutLayout/WithoutLay";
 import Layout from "../Admin/Layout/Layout";
 import UserLayout from "../User/Layout/Layout";
-import AddCourse from "../Admin/Dashboard/AddCourse";
-import AllCourse from "../Admin/Dashboard/AllCourse";
-import Users from "../Admin/Dashboard/Users";
-import UpdateCourse from "../Admin/Dashboard/UpdateCourse";
-import AddBlog from "../Admin/Dashboard/AddBlog";
-import AllBlogs from "../Admin/Dashboard/AllBlogs";
-import EditBlog from "../Admin/Dashboard/EditBlog";
 import WithOutLayout from "../User/WithoutLayout/WithOutLayout";
-import Register from "../User/Auth/Register";
-import ForgotPassword from "../User/Auth/ForgotPassword";
-import HomePage from "../User/Screens/HomePage";
-import Courses from "../User/Courses/Courses";
-import SingleCourse from "../User/Courses/SingleCourse";
-import Blogs from "../User/Blog/Blogs";
-import BlogDetails from "../User/Blog/BlogDetails";
-import WriteBlog from "../User/Blog/WriteBlog";
-import About from "../User/Screens/About";
-import Contact from "../User/Screens/Contact";
-import Certificate from "../User/Screens/Certificate";
-import UserDashboard from "../User/Courses/UserDashboard";
 import ErrorPage from "../User/Screens/ErrorPage";
+
+// Lazy-loaded Admin pages
+const Login = lazy(() => import("../Admin/Auth/Login"));
+const AddCourse = lazy(() => import("../Admin/Dashboard/AddCourse"));
+const AllCourse = lazy(() => import("../Admin/Dashboard/AllCourse"));
+const Users = lazy(() => import("../Admin/Dashboard/Users"));
+const UpdateCourse = lazy(() => import("../Admin/Dashboard/UpdateCourse"));
+const AddBlog = lazy(() => import("../Admin/Dashboard/AddBlog"));
+const AllBlogs = lazy(() => import("../Admin/Dashboard/AllBlogs"));
+const EditBlog = lazy(() => import("../Admin/Dashboard/EditBlog"));
+
+// Lazy-loaded User pages
+const UserLogin = lazy(() => import("../User/Auth/Login"));
+const Register = lazy(() => import("../User/Auth/Register"));
+const ForgotPassword = lazy(() => import("../User/Auth/ForgotPassword"));
+const HomePage = lazy(() => import("../User/Screens/HomePage"));
+const Courses = lazy(() => import("../User/Courses/Courses"));
+const SingleCourse = lazy(() => import("../User/Courses/SingleCourse"));
+const Blogs = lazy(() => import("../User/Blog/Blogs"));
+const BlogDetails = lazy(() => import("../User/Blog/BlogDetails"));
+const WriteBlog = lazy(() => import("../User/Blog/WriteBlog"));
+const About = lazy(() => import("../User/Screens/About"));
+const Contact = lazy(() => import("../User/Screens/Contact"));
+const Certificate = lazy(() => import("../User/Screens/Certificate"));
+const UserDashboard = lazy(() => import("../User/Courses/UserDashboard"));
+
+const FallbackLoader = () => (
+  <div className="d-flex justify-content-center align-items-center vh-100">
+    <div className="spinner-border text-primary" role="status">
+      <span className="visually-hidden">Loading...</span>
+    </div>
+  </div>
+);
 
 const AllRoutes = () => {
   return (
     <BrowserRouter>
       <ScrollToTop />
-      <Routes>
-        <Route
-          path="/admin"
-          element={
-            <WithoutLay>
-              <Login />
-            </WithoutLay>
-          }
-        />
-        <Route
-          path="/admin/add-course"
-          element={
-            <Layout>
-              <AddCourse />
-            </Layout>
-          }
-        />
-        <Route
-          path="/admin/all-course"
-          element={
-            <Layout>
-              <AllCourse />
-            </Layout>
-          }
-        />
-        <Route
-          path="/admin/edit-course/:id"
-          element={
-            <Layout>
-              <UpdateCourse />
-            </Layout>
-          }
-        />
-        <Route
-          path="/admin/users"
-          element={
-            <Layout>
-              <Users />
-            </Layout>
-          }
-        />
-        <Route
-          path="/admin/add-blog"
-          element={
-            <Layout>
-              <AddBlog />
-            </Layout>
-          }
-        />
-        <Route
-          path="/admin/all-blogs"
-          element={
-            <Layout>
-              <AllBlogs />
-            </Layout>
-          }
-        />
-        <Route
-          path="/admin/edit-blog/:id"
-          element={
-            <Layout>
-              <EditBlog />
-            </Layout>
-          }
-        />
+      <Suspense fallback={<FallbackLoader />}>
+        <Routes>
+          <Route
+            path="/admin"
+            element={
+              <WithoutLay>
+                <Login />
+              </WithoutLay>
+            }
+          />
+          <Route
+            path="/admin/add-course"
+            element={
+              <Layout>
+                <AddCourse />
+              </Layout>
+            }
+          />
+          <Route
+            path="/admin/all-course"
+            element={
+              <Layout>
+                <AllCourse />
+              </Layout>
+            }
+          />
+          <Route
+            path="/admin/edit-course/:id"
+            element={
+              <Layout>
+                <UpdateCourse />
+              </Layout>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <Layout>
+                <Users />
+              </Layout>
+            }
+          />
+          <Route
+            path="/admin/add-blog"
+            element={
+              <Layout>
+                <AddBlog />
+              </Layout>
+            }
+          />
+          <Route
+            path="/admin/all-blogs"
+            element={
+              <Layout>
+                <AllBlogs />
+              </Layout>
+            }
+          />
+          <Route
+            path="/admin/edit-blog/:id"
+            element={
+              <Layout>
+                <EditBlog />
+              </Layout>
+            }
+          />
 
-        {/* user routes */}
-        <Route
-          path="/register"
-          element={
-            <WithOutLayout>
-              <Register/>
-            </WithOutLayout>
-          }
-        />
-         <Route
-          path="/login"
-          element={
-            <WithOutLayout>
-              <UserLogin/>
-            </WithOutLayout>
-          }
-        />
-         <Route
-          path="/forgot-password"
-          element={
-            <WithOutLayout>
-              <ForgotPassword/>
-            </WithOutLayout>
-          }
-        />
-        <Route
-          path="/"
-          element={
-            <UserLayout>
-              <HomePage/>
-            </UserLayout>
-          }
-        />
+          {/* user routes */}
           <Route
-          path="/courses"
-          element={
-            <UserLayout>
-              <Courses/>
-            </UserLayout>
-          }
-        />
-        <Route
-          path="/blogs"
-          element={
-            <UserLayout>
-              <Blogs/>
-            </UserLayout>
-          }
-        />
-        <Route
-          path="/blogs/write"
-          element={
-            <UserLayout>
-              <WriteBlog/>
-            </UserLayout>
-          }
-        />
-        <Route
-          path="/blogs/:id"
-          element={
-            <UserLayout>
-              <BlogDetails/>
-            </UserLayout>
-          }
-        />
-         <Route
-          path="/about"
-          element={
-            <UserLayout>
-              <About/>
-            </UserLayout>
-          }
-        />
+            path="/register"
+            element={
+              <WithOutLayout>
+                <Register/>
+              </WithOutLayout>
+            }
+          />
           <Route
-          path="/contact"
-          element={
-            <UserLayout>
-              <Contact/>
-            </UserLayout>
-          }
-        />
-             <Route
-          path="/certificate"
-          element={
-            <UserLayout>
-              <Certificate/>
-            </UserLayout>
-          }
-        />
+            path="/login"
+            element={
+              <WithOutLayout>
+                <UserLogin/>
+              </WithOutLayout>
+            }
+          />
           <Route
-          path="/dashboard"
-          element={
-            <UserLayout>
-              <UserDashboard/>
-            </UserLayout>
-          }
-        />
-           <Route
-          path="/courses/:id"
-          element={
-            <UserLayout>
-              <SingleCourse/>
-            </UserLayout>
-          }
-        />
-        <Route
-          path="/*"
-          element={
-              <ErrorPage/>
-          }
-        />
-      </Routes>
+            path="/forgot-password"
+            element={
+              <WithOutLayout>
+                <ForgotPassword/>
+              </WithOutLayout>
+            }
+          />
+          <Route
+            path="/"
+            element={
+              <UserLayout>
+                <HomePage/>
+              </UserLayout>
+            }
+          />
+          <Route
+            path="/courses"
+            element={
+              <UserLayout>
+                <Courses/>
+              </UserLayout>
+            }
+          />
+          <Route
+            path="/blogs"
+            element={
+              <UserLayout>
+                <Blogs/>
+              </UserLayout>
+            }
+          />
+          <Route
+            path="/blogs/write"
+            element={
+              <UserLayout>
+                <WriteBlog/>
+              </UserLayout>
+            }
+          />
+          <Route
+            path="/blogs/:id"
+            element={
+              <UserLayout>
+                <BlogDetails/>
+              </UserLayout>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <UserLayout>
+                <About/>
+              </UserLayout>
+            }
+          />
+          <Route
+            path="/contact"
+            element={
+              <UserLayout>
+                <Contact/>
+              </UserLayout>
+            }
+          />
+          <Route
+            path="/certificate"
+            element={
+              <UserLayout>
+                <Certificate/>
+              </UserLayout>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <UserLayout>
+                <UserDashboard/>
+              </UserLayout>
+            }
+          />
+          <Route
+            path="/courses/:id"
+            element={
+              <UserLayout>
+                <SingleCourse/>
+              </UserLayout>
+            }
+          />
+          <Route
+            path="/*"
+            element={<ErrorPage/>}
+          />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 };

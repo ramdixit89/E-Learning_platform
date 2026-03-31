@@ -73,8 +73,19 @@ const getAllCourses = async (req, res) => {
       ];
     }
 
-    const courses = await Course.find(filters);
-    res.status(200).json({ courses });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const skip = (page - 1) * limit;
+
+    const courses = await Course.find(filters).skip(skip).limit(limit).sort({ createdAt: -1 });
+    const total = await Course.countDocuments(filters);
+
+    res.status(200).json({ 
+      courses, 
+      totalPages: Math.ceil(total / limit), 
+      currentPage: page,
+      totalCourses: total
+    });
   } catch (error) {
     console.error("Error fetching courses:", error);
     res.status(500).json({ message: "Internal server error" });

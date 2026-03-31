@@ -22,10 +22,13 @@ app.use(cors());
 app.use(express.json());
 // Middleware for parsing URL-encoded bodies
 app.use(bodyParser.urlencoded({ extended: true }));
-// Middleware for handling file uploads
-// app.use(fileUpload());
-app.use(fileUpload({ useTempFiles: true, tempFileDir: '/tmp/' }));
-// Allow multipart requests even when no files are attached (routes validate as needed)
+// Middleware for handling file uploads with 5MB size limit to prevent DoS
+app.use(fileUpload({ 
+    useTempFiles: true, 
+    tempFileDir: '/tmp/',
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+    abortOnLimit: true
+}));
 app.use('/uploads', express.static('uploads'));
 // Database connection
 dbConnection();
@@ -42,6 +45,14 @@ app.use('/api/blogs', blogRoutes);
 app.use(express.static(path.join(__dirname, 'dist')));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+// Global Error Handler Middleware
+app.use((err, req, res, next) => {
+  console.error("Unhandled Error:", err.stack);
+  res.status(err.status || 500).json({
+    message: err.message || "Something went wrong on the server."
+  });
 });
 
 app.listen(port, () => {

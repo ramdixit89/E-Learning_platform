@@ -56,13 +56,26 @@ exports.generateCertificate = async (req, res) => {
     const user = await User.findById(userId).select("username");
     const course = await CompletedCourse.findOne({ userId, courseId }).select("courseTitle");
 
-    if (!user || !course) {
-      return res.status(404).json({ message: "User or course not found." });
+    let courseTitle = course ? course.courseTitle : null;
+
+    if (!courseTitle) {
+       // Fallback: check if courseProgress says completed
+       const CourseProgress = require("../models/courseProgress");
+       const prog = await CourseProgress.findOne({ userId, courseId });
+       if (prog && prog.isCompleted) {
+           const Course = require("../models/courseModel");
+           const actualCourse = await Course.findById(courseId).select("title");
+           if (actualCourse) courseTitle = actualCourse.title;
+       }
+    }
+
+    if (!user || !courseTitle) {
+      return res.status(404).json({ message: "User or course not found, or course not completed." });
     }
 
     const certPath = await generateCertificate({
       username: user.username,
-      courseTitle: course.courseTitle,
+      courseTitle: courseTitle,
       userId,
       courseId,
     });
@@ -82,13 +95,25 @@ exports.emailCertificate = async (req, res) => {
     const user = await User.findById(userId).select("username email");
     const course = await CompletedCourse.findOne({ userId, courseId }).select("courseTitle");
 
-    if (!user || !course) {
-      return res.status(404).json({ message: "User or course not found." });
+    let courseTitle = course ? course.courseTitle : null;
+
+    if (!courseTitle) {
+       const CourseProgress = require("../models/courseProgress");
+       const prog = await CourseProgress.findOne({ userId, courseId });
+       if (prog && prog.isCompleted) {
+           const Course = require("../models/courseModel");
+           const actualCourse = await Course.findById(courseId).select("title");
+           if (actualCourse) courseTitle = actualCourse.title;
+       }
+    }
+
+    if (!user || !courseTitle) {
+      return res.status(404).json({ message: "User or course not found, or course not completed." });
     }
 
     const certPath = await generateCertificate({
       username: user.username,
-      courseTitle: course.courseTitle,
+      courseTitle: courseTitle,
       userId,
       courseId,
     });

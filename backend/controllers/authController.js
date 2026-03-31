@@ -13,7 +13,7 @@ const tokenGeneration = (userId, email, role) => {
 // 🔹 Register User with Image Upload
 const registerUser = async (req, res) => {
   try {
-    const { username, email, password, role } = req.body;
+    const { username, email, password } = req.body;
     // const image = req.files?.photo;
 
     if (!username || !email || !password ) {
@@ -24,9 +24,12 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: "Email is already registered" });
     }
     const hashedPassword = await bcrypt.hash(password, 8);
-    const userRole = role || 'user'; // Default role is 'user'
-    const token = tokenGeneration(email, userRole);
-    const user = new User({ username, email, password: hashedPassword, token, role: userRole });
+    const userRole = 'user'; // Prevent privilege escalation by forcing role to 'user'
+    
+    const user = new User({ username, email, password: hashedPassword, role: userRole });
+    const token = tokenGeneration(user._id, email, userRole);
+    user.token = token;
+    
     await user.save();
     // const imageName = await uploadImage(user._id, image, 'users');
     // user.photo = imageName;

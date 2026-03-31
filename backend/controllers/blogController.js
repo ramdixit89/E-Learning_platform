@@ -98,8 +98,19 @@ const getPublicBlogs = async (req, res) => {
       ];
     }
 
-    const blogs = await Blog.find(filters).sort({ createdAt: -1 });
-    res.status(200).json({ blogs });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const skip = (page - 1) * limit;
+
+    const blogs = await Blog.find(filters).sort({ createdAt: -1 }).skip(skip).limit(limit);
+    const total = await Blog.countDocuments(filters);
+
+    res.status(200).json({ 
+      blogs, 
+      totalPages: Math.ceil(total / limit), 
+      currentPage: page,
+      totalBlogs: total
+    });
   } catch (error) {
     console.error("Error fetching blogs:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -133,8 +144,19 @@ const getManageBlogs = async (req, res) => {
       filters.author = req.userId;
     }
 
-    const blogs = await Blog.find(filters).sort({ createdAt: -1 });
-    res.status(200).json({ blogs });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const skip = (page - 1) * limit;
+
+    const blogs = await Blog.find(filters).sort({ createdAt: -1 }).skip(skip).limit(limit);
+    const total = await Blog.countDocuments(filters);
+
+    res.status(200).json({ 
+      blogs, 
+      totalPages: Math.ceil(total / limit), 
+      currentPage: page,
+      totalBlogs: total
+    });
   } catch (error) {
     console.error("Error fetching blogs:", error);
     res.status(500).json({ message: "Internal server error" });
