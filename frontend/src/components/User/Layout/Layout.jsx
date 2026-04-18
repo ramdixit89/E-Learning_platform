@@ -1,6 +1,7 @@
 import React from 'react'
 import Header from '../Screens/Header'
 import Footer from '../Screens/Footer'
+import Chatbot from '../Chatbot/Chatbot'
 
 const Layout = ({ children }) => {
   return ( 
@@ -9,6 +10,7 @@ const Layout = ({ children }) => {
         {
             children
         }
+        <Chatbot/>
         <Footer/>
     </div>
   )

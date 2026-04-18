@@ -12,6 +12,7 @@ const completeCourse = require('./routes/completedCourseRoutes');
 const progressRoutes = require('./routes/progressRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const blogRoutes = require('./routes/blogRoutes');
+const chatbotRoutes = require('./routes/chatbotRoutes');
 // const postRouter = require('./routes/postRoutes');
 dotenv.config();
 const app = express();
@@ -39,6 +40,7 @@ app.use('/api/complete-course', completeCourse)
 app.use('/api/progress', progressRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/blogs', blogRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 // app.use('/', postRouter);
 // Start the server
 // Serve frontend

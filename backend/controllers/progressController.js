@@ -53,7 +53,7 @@ const updateProgress = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(courseId)) {
       return res.status(400).json({ message: "Invalid courseId" });
     }
-    const { currentTopicIndex, completedTopicIndex, isCompleted } = req.body;
+    const { currentTopicIndex, completedTopicIndex, isCompleted, quizScore, quizTotal } = req.body;
 
     const progress = await CourseProgress.findOne({ userId, courseId });
     if (!progress) {
@@ -72,6 +72,10 @@ const updateProgress = async (req, res) => {
 
     if (typeof isCompleted === "boolean") {
       progress.isCompleted = isCompleted;
+    }
+
+    if (typeof quizScore === "number" && typeof quizTotal === "number") {
+      progress.quizScores.push({ score: quizScore, total: quizTotal });
     }
 
     await progress.save();

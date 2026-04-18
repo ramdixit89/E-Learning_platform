@@ -77,14 +77,14 @@ const Header = () => {
                   borderRadius: "8px",
                   fontSize: "0.875rem",
                   fontWeight: 500,
-                  color: isActive(link.to) ? "#f1f5f9" : "#94a3b8",
+                  color: isActive(link.to) ? "var(--text)" : "var(--text-muted)",
                   background: isActive(link.to) ? "rgba(99,102,241,0.12)" : "transparent",
                   border: isActive(link.to) ? "1px solid rgba(99,102,241,0.2)" : "1px solid transparent",
                   transition: "all 0.2s ease",
                   textDecoration: "none",
                 }}
-                onMouseEnter={(e) => { if (!isActive(link.to)) { e.target.style.color = "#f1f5f9"; e.target.style.background = "rgba(255,255,255,0.05)"; } }}
-                onMouseLeave={(e) => { if (!isActive(link.to)) { e.target.style.color = "#94a3b8"; e.target.style.background = "transparent"; } }}
+                onMouseEnter={(e) => { if (!isActive(link.to)) { e.target.style.color = "var(--text)"; e.target.style.background = "rgba(0,0,0,0.05)"; } }}
+                onMouseLeave={(e) => { if (!isActive(link.to)) { e.target.style.color = "var(--text-muted)"; e.target.style.background = "transparent"; } }}
               >
                 {link.label}
               </Link>
@@ -110,7 +110,7 @@ const Header = () => {
                     display: "flex", alignItems: "center", gap: "0.5rem",
                     background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)",
                     borderRadius: "9999px", padding: "0.35rem 0.75rem 0.35rem 0.35rem",
-                    cursor: "pointer", color: "#f1f5f9", transition: "all 0.2s ease",
+                    cursor: "pointer", color: "var(--text)", transition: "all 0.2s ease",
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.borderColor = "#6366f1"}
                   onMouseLeave={(e) => e.currentTarget.style.borderColor = "rgba(99,102,241,0.2)"}
@@ -138,9 +138,9 @@ const Header = () => {
                     <Link
                       to="/dashboard"
                       onClick={() => setDropdownOpen(false)}
-                      style={{ display: "flex", alignItems: "center", gap: "0.6rem", padding: "0.65rem 0.9rem", borderRadius: "8px", color: "#94a3b8", fontSize: "0.875rem", textDecoration: "none", transition: "all 0.2s ease" }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(99,102,241,0.1)"; e.currentTarget.style.color = "#f1f5f9"; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#94a3b8"; }}
+                      style={{ display: "flex", alignItems: "center", gap: "0.6rem", padding: "0.65rem 0.9rem", borderRadius: "8px", color: "var(--text-muted)", fontSize: "0.875rem", textDecoration: "none", transition: "all 0.2s ease" }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(99,102,241,0.1)"; e.currentTarget.style.color = "var(--text)"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--text-muted)"; }}
                     >
                       <FaBook style={{ color: "#6366f1", fontSize: "13px" }} />
                       My Dashboard
@@ -176,8 +176,8 @@ const Header = () => {
           <div
             className="d-lg-none"
             style={{
-              background: "rgba(9,13,31,0.97)", backdropFilter: "blur(20px)",
-              borderTop: "1px solid rgba(255,255,255,0.07)", padding: "1rem 1.5rem 1.5rem",
+              background: "var(--surface)", backdropFilter: "blur(20px)",
+              borderTop: "1px solid var(--border)", padding: "1rem 1.5rem 1.5rem",
               animation: "fadeInUp 0.2s ease",
             }}
           >
@@ -187,7 +187,7 @@ const Header = () => {
                   key={link.to} to={link.to}
                   style={{
                     padding: "0.75rem 1rem", borderRadius: "10px", fontSize: "0.9rem", fontWeight: 500,
-                    color: isActive(link.to) ? "#818cf8" : "#94a3b8",
+                    color: isActive(link.to) ? "var(--primary)" : "var(--text-muted)",
                     background: isActive(link.to) ? "rgba(99,102,241,0.1)" : "transparent",
                     textDecoration: "none", transition: "all 0.2s ease",
                   }}
@@ -203,7 +203,7 @@ const Header = () => {
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                <Link to="/dashboard" style={{ padding: "0.7rem 1rem", borderRadius: "10px", color: "#94a3b8", fontSize: "0.875rem", textDecoration: "none" }}>My Dashboard</Link>
+                <Link to="/dashboard" style={{ padding: "0.7rem 1rem", borderRadius: "10px", color: "var(--text)", fontSize: "0.875rem", textDecoration: "none" }}>My Dashboard</Link>
                 <button onClick={logOut} style={{ padding: "0.7rem 1rem", borderRadius: "10px", color: "#f87171", background: "transparent", border: "none", cursor: "pointer", textAlign: "left", fontSize: "0.875rem" }}>Logout</button>
               </div>
             )}

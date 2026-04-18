@@ -61,7 +61,7 @@ const getRatingSummary = async (req, res) => {
       return res.status(400).json({ message: "Invalid courseId" });
     }
     const stats = await Review.aggregate([
-      { $match: { courseId: mongoose.Types.ObjectId(courseId) } },
+      { $match: { courseId: new mongoose.Types.ObjectId(courseId) } },
       {
         $group: {
           _id: "$courseId",

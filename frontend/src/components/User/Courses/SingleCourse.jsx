@@ -7,6 +7,7 @@ import {
   FaCertificate,
   FaPlayCircle,
   FaStar,
+  FaRobot,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -25,6 +26,10 @@ const SingleCourse = () => {
   const [ratingSummary, setRatingSummary] = useState({ averageRating: 0, reviewsCount: 0 });
   const [reviewForm, setReviewForm] = useState({ rating: 5, comment: "" });
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
+  const [isGeneratingInterview, setIsGeneratingInterview] = useState(false);
+  const [quizAnswers, setQuizAnswers] = useState({});
+  const [showQuizResults, setShowQuizResults] = useState(false);
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
 
@@ -223,6 +228,60 @@ const SingleCourse = () => {
     }
   };
 
+  const handleGenerateAI = async (type) => {
+    if (!token) return alert("Please log in first.");
+    if (type === "quiz") setIsGeneratingQuiz(true);
+    else setIsGeneratingInterview(true);
+
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/course/generate-ai-content/${id}`,
+        { type },
+        { headers: { Authorization: token } }
+      );
+      
+      setCourse(prev => {
+        const updatedCourse = { ...prev };
+        if (type === "quiz") updatedCourse.quizzes = response.data.data;
+        if (type === "interview") updatedCourse.interviewQuestions = response.data.data;
+        return updatedCourse;
+      });
+
+    } catch (error) {
+      console.error("Error generating AI content:", error);
+      alert("Failed to generate AI content. Make sure your API key is correctly configured in the backend.");
+    } finally {
+      if (type === "quiz") setIsGeneratingQuiz(false);
+      else setIsGeneratingInterview(false);
+    }
+  };
+
+  const calculateQuizScore = () => {
+    if(!course.quizzes) return 0;
+    let score = 0;
+    course.quizzes.forEach((q, idx) => {
+      if(quizAnswers[idx] === q.correctAnswer) score++;
+    });
+    return score;
+  };
+
+  const handleSubmitQuiz = async () => {
+    const finalScore = calculateQuizScore();
+    setShowQuizResults(true);
+    
+    // Save to backend seamlessly
+    if (!token) return;
+    try {
+      await axios.patch(
+        `${API_URL}/api/progress/${course._id}`,
+        { quizScore: finalScore, quizTotal: course.quizzes.length },
+        { headers: { Authorization: token } }
+      );
+    } catch (error) {
+      console.error("Failed to save quiz score:", error);
+    }
+  };
+
   return (
     <div className="container page">
       {/* Course Header */}
@@ -380,6 +439,120 @@ const SingleCourse = () => {
           </div>
         </motion.div>
       )}
+
+      {/* AI Practice Arena Section */}
+      <motion.div
+        className="card-premium mt-5 position-relative overflow-hidden"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        style={{ background: 'var(--surface)', border: '1px solid rgba(79, 70, 229, 0.3)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}
+      >
+        <div className="position-absolute top-0 start-0 w-100 h-100 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(79,70,229,0.05), rgba(6,182,212,0.05))' }}></div>
+        
+        <div className="position-relative z-1 p-3 p-md-4">
+          <div className="d-flex align-items-center mb-4 gap-3 border-bottom border-secondary pb-3" style={{ borderColor: 'var(--glass-border)' }}>
+            <div style={{ background: 'linear-gradient(135deg, #4f46e5, #06b6d4)', padding: '0.75rem', borderRadius: '1rem', color: 'white', display: 'flex' }}>
+               <FaRobot size={24} />
+            </div>
+            <div>
+               <h3 className="fw-bold mb-0 text-light">RDCoder's AI</h3>
+               <small className="text-muted">Master this course with AI-generated dynamic checkpoints.</small>
+            </div>
+          </div>
+
+          <div className="row g-4">
+            {/* Quiz Generation Column */}
+            <div className="col-md-6">
+               <div className="p-4 rounded-4 h-100 border border-secondary d-flex flex-column" style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'var(--glass-border)' }}>
+                 <h5 className="text-white mb-3 fw-bold">Dynamic Quiz</h5>
+                 <p className="text-muted fs-7 mb-4">Challenge your knowledge with a multiple-choice quiz strictly generated from this syllabus.</p>
+                 
+                 {course.quizzes && course.quizzes.length > 0 ? (
+                    <div className="d-flex flex-column flex-grow-1">
+                      <span className="badge bg-success mb-3 px-3 py-2 align-self-start">✓ Quiz Ready</span>
+                      <div className="d-flex flex-column gap-4 flex-grow-1 overflow-auto" style={{ maxHeight: '400px', paddingRight: '10px' }}>
+                        {course.quizzes.map((q, idx) => (
+                           <div key={idx} className="border border-secondary rounded-3 p-3" style={{ background: 'rgba(0,0,0,0.1)' }}>
+                              <p className="text-light fw-bold mb-3">{idx + 1}. {q.question}</p>
+                              <div className="d-flex flex-column gap-2">
+                                 {q.options.map((opt, optIdx) => (
+                                    <label key={optIdx} className={`p-2 rounded-2 border ${quizAnswers[idx] === opt ? 'border-primary bg-primary bg-opacity-25' : 'border-secondary'} ${showQuizResults && opt === q.correctAnswer ? 'border-success bg-success bg-opacity-25' : ''} ${showQuizResults && quizAnswers[idx] === opt && opt !== q.correctAnswer ? 'border-danger bg-danger bg-opacity-25' : ''}`} style={{ cursor: showQuizResults ? 'default' : 'pointer', transition: 'all 0.2s', borderColor: 'var(--glass-border)' }}>
+                                      <input type="radio" name={`quiz-${idx}`} value={opt} className="me-2 d-none" onChange={() => setQuizAnswers(prev => ({...prev, [idx]: opt}))} disabled={showQuizResults} />
+                                      <span className="text-muted" style={{ fontSize: '0.9rem' }}>{opt}</span>
+                                    </label>
+                                 ))}
+                              </div>
+                              {showQuizResults && (
+                                <div className="mt-3 p-2 rounded-2 border border-secondary" style={{ background: 'rgba(6, 182, 212, 0.1)' }}>
+                                  <small className="text-info fw-bold">Explanation:</small>
+                                  <p className="text-muted mb-0 fs-7 mt-1">{q.explanation}</p>
+                                </div>
+                              )}
+                           </div>
+                        ))}
+                      </div>
+                      {!showQuizResults ? (
+                        <button className="btn btn-primary w-100 mt-4 rounded-pill fw-bold" onClick={handleSubmitQuiz}>Submit Quiz</button>
+                      ) : (
+                        <div className="text-center mt-4 p-3 rounded-3 border border-success bg-success bg-opacity-10">
+                          <h4 className="text-success fw-bold mb-0">Score: {calculateQuizScore()} / {course.quizzes.length}</h4>
+                        </div>
+                      )}
+                    </div>
+                 ) : (
+                    <div className="mt-auto pt-3 border-top border-secondary" style={{ borderColor: 'var(--glass-border)' }}>
+                      <button 
+                        className="btn w-100 rounded-pill fw-bold py-2 shadow-sm" 
+                        style={{ background: 'linear-gradient(135deg, #4f46e5, #6366f1)', color: 'white' }}
+                        onClick={() => handleGenerateAI('quiz')}
+                        disabled={isGeneratingQuiz}
+                      >
+                        {isGeneratingQuiz ? <span className="spinner-border spinner-border-sm me-2"></span> : "✨ "} 
+                        {isGeneratingQuiz ? "Generating Output..." : "Generate AI Quiz"}
+                      </button>
+                    </div>
+                 )}
+               </div>
+            </div>
+
+            {/* Interview Prep Column */}
+            <div className="col-md-6">
+               <div className="p-4 rounded-4 h-100 border border-secondary d-flex flex-column" style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'var(--glass-border)' }}>
+                 <h5 className="text-white mb-3 fw-bold">Interview Prep</h5>
+                 <p className="text-muted fs-7 mb-4">Simulate a technical interview. The AI will extrapolate high-level interview questions from this syllabus.</p>
+                 
+                 {course.interviewQuestions && course.interviewQuestions.length > 0 ? (
+                    <div className="d-flex flex-column flex-grow-1">
+                      <span className="badge bg-success mb-3 px-3 py-2 align-self-start">✓ Prep Ready</span>
+                      <div className="d-flex flex-column gap-3 flex-grow-1 overflow-auto" style={{ maxHeight: '400px', paddingRight: '10px' }}>
+                        {course.interviewQuestions.map((iq, idx) => (
+                           <div key={idx} className="border border-secondary rounded-3 p-3 text-start" style={{ background: 'rgba(0,0,0,0.1)' }}>
+                              <p className="text-light fw-bold fst-italic mb-2" style={{ fontSize: '0.95rem' }}>Q: {iq.question}</p>
+                              <p className="text-muted fs-7 mb-0 pb-0" style={{ borderLeft: '3px solid #06b6d4', paddingLeft: '10px', background: 'rgba(6, 182, 212, 0.05)', padding: '0.5rem' }}>{iq.answer}</p>
+                           </div>
+                        ))}
+                      </div>
+                    </div>
+                 ) : (
+                    <div className="mt-auto pt-3 border-top border-secondary" style={{ borderColor: 'var(--glass-border)' }}>
+                      <button 
+                        className="btn w-100 rounded-pill fw-bold border-0 py-2 shadow-sm" 
+                        style={{ background: 'linear-gradient(135deg, #06b6d4, #3b82f6)', color: 'white' }}
+                        onClick={() => handleGenerateAI('interview')}
+                        disabled={isGeneratingInterview}
+                      >
+                        {isGeneratingInterview ? <span className="spinner-border spinner-border-sm me-2"></span> : "🎙️ "} 
+                        {isGeneratingInterview ? "Generating Output..." : "Generate Interview Prep"}
+                      </button>
+                    </div>
+                 )}
+               </div>
+            </div>
+
+          </div>
+        </div>
+      </motion.div>
 
       {/* Reviews Section */}
       <motion.div

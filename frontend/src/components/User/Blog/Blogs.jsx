@@ -58,11 +58,11 @@ const Blogs = () => {
                 Deep dives, tutorials and guides by developers, for developers.
               </p>
             </div>
-            {token && (
+            {/* {token && (
               <Link to="/blogs/write" className="btn-primary-custom" style={{ alignSelf: "flex-start" }}>
                 <FaPen /> Write a Post
               </Link>
-            )}
+            )} */}
           </div>
 
           {/* Search */}

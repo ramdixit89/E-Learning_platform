@@ -27,6 +27,9 @@ const Courses = () => {
   const [level, setLevel] = useState("");
   const [tag, setTag] = useState("");
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const navigate = useNavigate();
 
   const notifications = [
@@ -43,28 +46,50 @@ const Courses = () => {
     }
   }, []);
 
+  // Reset page to 1 when filters change
   useEffect(() => {
+    setPage(1);
+  }, [search, level, tag]);
+
+  useEffect(() => {
+    const controller = new AbortController();
     const fetchCourses = async () => {
-      setLoading(true);
+      if (page === 1) setLoading(true);
+      else setLoadingMore(true);
+
       try {
-        const params = {};
+        const params = { page, limit: 12 };
         if (search) params.search = search;
         if (level) params.level = level;
         if (tag) params.tag = tag;
         const response = await axios.get(`${API_URL}/api/course/get-course`, {
           params: { ...params, public: true },
           headers: { Authorization: localStorage.getItem("token") },
+          signal: controller.signal
         });
-        setCourses(response.data.courses || []);
+        
+        const fetchedCourses = response.data.courses || [];
+        if (page === 1) {
+          setCourses(fetchedCourses);
+        } else {
+          setCourses(prev => [...prev, ...fetchedCourses]);
+        }
+        setHasMore(page < response.data.totalPages);
       } catch (error) {
-        console.error("Error fetching courses:", error);
+        if (!axios.isCancel(error)) {
+          console.error("Error fetching courses:", error);
+        }
       } finally {
         setLoading(false);
+        setLoadingMore(false);
       }
     };
-    const debounce = setTimeout(fetchCourses, 350);
-    return () => clearTimeout(debounce);
-  }, [search, level, tag]);
+    const debounce = setTimeout(fetchCourses, page === 1 ? 350 : 0);
+    return () => {
+      clearTimeout(debounce);
+      controller.abort();
+    };
+  }, [search, level, tag, page]);
 
   return (
     <div className="page">
@@ -145,6 +170,7 @@ const Courses = () => {
               ))}
             </div>
           ) : courses.length > 0 ? (
+            <>
             <div className="row g-4">
               {courses.map((course, i) => (
                 <motion.div
@@ -209,6 +235,20 @@ const Courses = () => {
                 </motion.div>
               ))}
             </div>
+            
+            {hasMore && (
+              <div style={{ textAlign: "center", marginTop: "2rem" }}>
+                <button 
+                  className="btn-primary-custom" 
+                  onClick={() => setPage(p => p + 1)}
+                  disabled={loadingMore}
+                  style={{ display: "inline-flex", opacity: loadingMore ? 0.7 : 1 }}
+                >
+                  {loadingMore ? "Loading..." : "Load More Courses"}
+                </button>
+              </div>
+            )}
+            </>
           ) : (
             <div style={{ textAlign: "center", padding: "5rem 2rem", color: "var(--text-dim)" }}>
               <div style={{ fontSize: "4rem", marginBottom: "1rem" }}>🔍</div>
@@ -221,42 +261,6 @@ const Courses = () => {
         {/* ── RIGHT SIDEBAR ── */}
         <div className="d-none d-xl-block" style={{ width: "280px", flexShrink: 0 }}>
           <div className="topic-sidebar">
-
-            {/* Notifications */}
-            <div style={{
-              background: "var(--surface)", border: "1px solid var(--border)",
-              borderRadius: "var(--radius-lg)", padding: "1.25rem", marginBottom: "1.25rem",
-            }}>
-              <h6 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "0.875rem", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <FaBell style={{ color: "#fbbf24" }} /> Live Updates
-              </h6>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-                {notifications.map((n, i) => (
-                  <div key={i} className="notification-item">
-                    <span style={{ marginRight: "0.5rem" }}>{n.emoji}</span>
-                    {n.text}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Upgrade CTA */}
-            <div style={{
-              background: "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(6,182,212,0.15))",
-              border: "1px solid rgba(99,102,241,0.25)",
-              borderRadius: "var(--radius-lg)", padding: "1.5rem", textAlign: "center",
-            }}>
-              <div style={{ fontSize: "2rem", marginBottom: "0.75rem" }}>⚡</div>
-              <h6 style={{ fontFamily: "var(--font-display)", fontWeight: 700, marginBottom: "0.5rem" }}>
-                Go Pro
-              </h6>
-              <p style={{ color: "var(--text-muted)", fontSize: "0.8rem", marginBottom: "1rem", lineHeight: 1.6 }}>
-                Unlock all premium courses and get priority support.
-              </p>
-              <button className="btn-primary-custom" style={{ width: "100%", justifyContent: "center", fontSize: "0.85rem" }}>
-                Upgrade Now
-              </button>
-            </div>
 
             {/* Achievement */}
             <div style={{

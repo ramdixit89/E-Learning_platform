@@ -105,12 +105,13 @@ const UserDashboard = () => {
 
   // Stats
   const totalTopicsDone = inProgressCourses.reduce((sum, p) => sum + (p.completedTopics?.length || 0), 0);
+  const totalQuizzesTaken = inProgressCourses.reduce((sum, p) => sum + (p.quizScores?.length || 0), 0);
 
   const stats = [
     { icon: "📚", label: "In Progress", value: inProgressCourses.length, color: "rgba(99,102,241,0.12)", iconColor: "#818cf8", border: "rgba(99,102,241,0.2)" },
     { icon: "🏆", label: "Certificates", value: completedCourses.length, color: "rgba(245,158,11,0.12)", iconColor: "#fbbf24", border: "rgba(245,158,11,0.2)" },
     { icon: "✅", label: "Topics Done", value: totalTopicsDone, color: "rgba(16,185,129,0.12)", iconColor: "#34d399", border: "rgba(16,185,129,0.2)" },
-    { icon: "🔥", label: "Day Streak", value: 7, color: "rgba(239,68,68,0.12)", iconColor: "#f87171", border: "rgba(239,68,68,0.2)" },
+    { icon: "🎯", label: "Quizzes Completed", value: totalQuizzesTaken, color: "rgba(236,72,153,0.12)", iconColor: "#f472b6", border: "rgba(236,72,153,0.2)" },
   ];
 
   return (
@@ -356,6 +357,58 @@ const UserDashboard = () => {
                   </div>
                 )
             }
+          </div>
+        </div>
+
+        {/* ── AI Quizzes Completed ── */}
+        <div style={{ marginBottom: "4rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem", marginTop: "3rem" }}>
+            <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "1.35rem", margin: 0 }}>
+              Recent <span className="text-gradient">AI Quizzes</span>
+            </h2>
+          </div>
+          
+          <div className="d-flex flex-column gap-3">
+             {loadingProgress ? (
+                <div style={{ height: "80px", background: "var(--surface-2)", borderRadius: "var(--radius-lg)", animation: "skeleton-shimmer 1.6s infinite" }}></div>
+             ) : inProgressCourses.filter(p => p.quizScores && p.quizScores.length > 0).length > 0 ? (
+                inProgressCourses.filter(p => p.quizScores && p.quizScores.length > 0).map((prog, i) => {
+                   const bestQuiz = prog.quizScores.reduce((prev, current) => (prev.score > current.score) ? prev : current);
+                   return (
+                      <motion.div key={`quiz-${i}`} initial="hidden" animate="visible" variants={fadeUp} custom={i} style={{
+                         background: "var(--surface)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "1.25rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem", borderColor: 'var(--border)'
+                      }}
+                         onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--primary-color)"; }}
+                         onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; }}
+                      >
+                         <div className="d-flex align-items-center gap-3">
+                            <div style={{ width: 45, height: 45, borderRadius: 10, background: "rgba(236, 72, 153, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.2rem", flexShrink: 0 }}>
+                               🎯
+                            </div>
+                            <div>
+                               <h6 style={{ margin: 0, fontWeight: 700, color: "var(--text-main)" }}>{prog.courseId?.title}</h6>
+                               <small style={{ color: "var(--text-dim)" }}>Score recorded on {new Date(bestQuiz.date).toLocaleDateString()}</small>
+                            </div>
+                         </div>
+                         <div className="d-flex align-items-center gap-4">
+                            <div className="text-center">
+                               <div style={{ fontSize: "1.1rem", fontWeight: 800, color: bestQuiz.score >= (bestQuiz.total / 2) ? "#34d399" : "#f87171" }}>
+                                  {bestQuiz.score} / {bestQuiz.total}
+                               </div>
+                               <small style={{ color: "var(--text-dim)", fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "1px" }}>Best Score</small>
+                            </div>
+                            <Link to={`/courses/${prog.courseId?._id}`} className="btn-primary-custom" style={{ textDecoration: "none", padding: "0.5rem 1rem", fontSize: "0.85rem", display: 'flex', alignItems: 'center' }}>
+                               Retake Quiz <FaArrowRight className="ms-2" style={{ fontSize: "10px" }} />
+                            </Link>
+                         </div>
+                      </motion.div>
+                   )
+                })
+             ) : (
+                <div style={{ textAlign: "center", padding: "2.5rem", border: "1px dashed var(--glass-border)", borderRadius: "var(--radius-lg)" }}>
+                   <p className="text-muted mb-0">You haven't taken any AI Quizzes yet. Generate one inside a course to test your knowledge!</p>
+                </div>
+             )}
           </div>
         </div>
       </div>

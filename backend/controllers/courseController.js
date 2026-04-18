@@ -1,5 +1,7 @@
 const Course = require("../models/courseModel");
 const { uploadImage } = require("../config/uploadImage");
+const NodeCache = require("node-cache");
+const courseCache = new NodeCache({ stdTTL: 600 }); // Cache for 10 minutes
 
 // 📌 Create a new course (including topics)
 const createCourse = async (req, res) => {
@@ -32,6 +34,7 @@ const createCourse = async (req, res) => {
     });
 
     await newCourse.save();
+    courseCache.flushAll();
     res.status(201).json({ message: "Course created successfully", course: newCourse });
   } catch (error) {
     console.error("Error creating course:", error);
@@ -47,6 +50,20 @@ const createCourse = async (req, res) => {
 const getAllCourses = async (req, res) => {
   try {
     const { search, level, tag, status, public: publicOnly } = req.query;
+    
+    // Check cache if it's a simple public listing query with no special filters except public
+    const isPublicDefaultList = (publicOnly === "1" || publicOnly === "true") && !search && !level && !tag && !status;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const cacheKey = `public_courses_page_${page}_limit_${limit}`;
+
+    if (isPublicDefaultList) {
+      const cachedData = courseCache.get(cacheKey);
+      if (cachedData) {
+        return res.status(200).json(cachedData);
+      }
+    }
+
     const filters = {};
 
     if (publicOnly === "1" || publicOnly === "true") {
@@ -64,28 +81,31 @@ const getAllCourses = async (req, res) => {
     }
 
     if (search) {
-      const regex = new RegExp(search, "i");
-      filters.$or = [
-        { title: regex },
-        { description: regex },
-        { author: regex },
-        { tags: regex },
-      ];
+      filters.$text = { $search: search };
     }
 
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 50;
     const skip = (page - 1) * limit;
 
-    const courses = await Course.find(filters).skip(skip).limit(limit).sort({ createdAt: -1 });
+    // Exclude heavy fields from arrays to save bandwidth but keep the array length intact
+    const courses = await Course.find(filters)
+      .select('-topics.content -topics.videoUrl -topics.resources -topics.title -quizzes -interviewQuestions')
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
     const total = await Course.countDocuments(filters);
 
-    res.status(200).json({ 
+    const responseData = { 
       courses, 
       totalPages: Math.ceil(total / limit), 
       currentPage: page,
       totalCourses: total
-    });
+    };
+
+    if (isPublicDefaultList) {
+      courseCache.set(cacheKey, responseData);
+    }
+
+    res.status(200).json(responseData);
   } catch (error) {
     console.error("Error fetching courses:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -145,6 +165,7 @@ const updateCourse = async (req, res) => {
 
     // Update course
     const updatedCourse = await Course.findByIdAndUpdate(id, updateData, { new: true });
+    courseCache.flushAll();
 
     res.status(200).json({ message: "Course updated successfully", course: updatedCourse });
   } catch (error) {
@@ -166,6 +187,7 @@ const deleteCourse = async (req, res) => {
       return res.status(404).json({ message: "Course not found" });
     }
 
+    courseCache.flushAll();
     res.status(200).json({ message: "Course deleted successfully" });
   } catch (error) {
     console.error("Error deleting course:", error);

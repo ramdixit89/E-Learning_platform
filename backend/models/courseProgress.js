@@ -29,6 +29,13 @@ const courseProgressSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    quizScores: [
+      {
+        score: { type: Number, required: true },
+        total: { type: Number, required: true },
+        date: { type: Date, default: Date.now },
+      }
+    ]
   },
   { timestamps: true }
 );
