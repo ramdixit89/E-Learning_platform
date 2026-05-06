@@ -2,9 +2,12 @@ import React, { useState, useRef } from "react";
 import JoditEditor from "jodit-react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { FaMagic, FaSpinner } from "react-icons/fa";
 
 const AddCourse = () => {
   const editor = useRef(null);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [description, setDescription] = useState("");
@@ -123,6 +126,36 @@ const config = {
     );
   };
 
+  // Handle AI Auto-Generate
+  const handleAiGenerate = async () => {
+    if (!aiPrompt) return alert("Please enter a topic to generate!");
+    setIsGenerating(true);
+    try {
+      const { data } = await axios.post("http://localhost:5000/api/course/generate-ai-skeleton", { prompt: aiPrompt });
+      const aiCourse = data.course;
+      if (aiCourse) {
+        setTitle(aiCourse.title || "");
+        setDescription(aiCourse.description || "");
+        setLevel((aiCourse.level || "beginner").toLowerCase());
+        setDuration(aiCourse.duration || "");
+        setTags(aiCourse.tags || "");
+        // Map topics to ensure they have the exact structure needed
+        const newTopics = (aiCourse.topics || []).map(t => ({
+          title: t.title || "",
+          content: t.content || "",
+          videoUrl: "",
+          resources: [{ title: "", url: "" }]
+        }));
+        setTopics(newTopics.length > 0 ? newTopics : topics);
+        alert("Course generated! Please review the content and add a thumbnail.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to generate course. Please ensure GROQ_API_KEY is configured.");
+    }
+    setIsGenerating(false);
+  };
+
   // Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -164,10 +197,40 @@ const config = {
   };
 
   return (
-    <div className="container mt-4">
-      <h2 className="mb-3">Add Course</h2>
+    <div className="container mt-4 pb-5">
+      <div className="d-flex align-items-center justify-content-between mb-4">
+        <h2 className="admin-header-title">Add New Course</h2>
+      </div>
+
+      {/* ✨ AI Generator Console */}
+      <div className="card-glass mb-4 p-4" style={{ border: "1px solid rgba(99,102,241,0.3)", background: "var(--surface-2)" }}>
+        <h5 style={{ color: "var(--primary)", fontWeight: "bold", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <FaMagic /> AI Auto-Course Creator
+        </h5>
+        <p style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Type a topic and let AI instantly generate the entire structured syllabus, titles, and rich-text descriptions.</p>
+        <div className="d-flex gap-2">
+          <input 
+            type="text" 
+            className="form-control" 
+            placeholder="E.g., Complete Python Bootcamp 2024: Zero to Hero" 
+            value={aiPrompt} 
+            onChange={(e) => setAiPrompt(e.target.value)}
+            disabled={isGenerating}
+          />
+          <button 
+            type="button" 
+            className="btn-primary-custom" 
+            onClick={handleAiGenerate} 
+            disabled={isGenerating}
+            style={{ minWidth: "180px", justifyContent: "center" }}
+          >
+            {isGenerating ? <><FaSpinner className="fa-spin" /> Generating...</> : <><FaMagic /> Generate Magic</>}
+          </button>
+        </div>
+      </div>
       
-      <form onSubmit={handleSubmit}>
+      <div className="admin-form-container">
+        <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label className="form-label fw-bold">Course Title</label>
           <input
@@ -338,7 +401,8 @@ const config = {
         </button>
 
         <button type="submit" className="btn btn-primary">Save Course</button>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

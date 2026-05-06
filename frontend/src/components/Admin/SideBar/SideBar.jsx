@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   {
     label: "Dashboard",
     icon: <FaHome />,
-    to: "/admin",
+    to: "/admin/dashboard",
     exact: true,
   },
   {

@@ -11,6 +11,7 @@ import ErrorPage from "../User/Screens/ErrorPage";
 
 // Lazy-loaded Admin pages
 const Login = lazy(() => import("../Admin/Auth/Login"));
+const AdminDashboard = lazy(() => import("../Admin/Dashboard/AdminDashboard"));
 const AddCourse = lazy(() => import("../Admin/Dashboard/AddCourse"));
 const AllCourse = lazy(() => import("../Admin/Dashboard/AllCourse"));
 const Users = lazy(() => import("../Admin/Dashboard/Users"));
@@ -54,6 +55,14 @@ const AllRoutes = () => {
               <WithoutLay>
                 <Login />
               </WithoutLay>
+            }
+          />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <Layout>
+                <AdminDashboard />
+              </Layout>
             }
           />
           <Route

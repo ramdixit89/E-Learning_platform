@@ -157,10 +157,10 @@ const updateCourse = async (req, res) => {
       updateData.thumbnail = newThumbnailUrl;
     }
 
-    // Handle topics: Merge existing and new topics
+    // Handle topics: Overwrite existing topics with the updated ones from frontend
     if (topics) {
       const parsedTopics = typeof topics === "string" ? JSON.parse(topics) : topics;
-      updateData.topics = [...existingCourse.topics, ...parsedTopics]; // Append new topics
+      updateData.topics = parsedTopics; 
     }
 
     // Update course

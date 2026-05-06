@@ -21,7 +21,7 @@ const Login = () => {
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
         alert("Login successful");
-        window.location.href = "/admin/add-course"; // Redirect to admin dashboard
+        window.location.href = "/admin/dashboard"; // Redirect to admin dashboard
       }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");

@@ -1,6 +1,6 @@
 const express = require('express');
 const { createCourse, deleteCourse, updateCourse, getAllCourses, getCourseById } = require('../controllers/courseController');
-const { generateAiAssessment } = require('../controllers/aiContentController');
+const { generateAiAssessment, generateCourseSkeleton } = require('../controllers/aiContentController');
 const courseRoutes = express.Router();
 
 //Add course
@@ -15,5 +15,7 @@ courseRoutes.put('/update-course/:id', updateCourse);
 courseRoutes.get('/get-single-course/:id', getCourseById);
 //Generate AI Assessment
 courseRoutes.post('/generate-ai-content/:id', generateAiAssessment);
+//Generate AI Course Skeleton
+courseRoutes.post('/generate-ai-skeleton', generateCourseSkeleton);
 
 module.exports = courseRoutes;

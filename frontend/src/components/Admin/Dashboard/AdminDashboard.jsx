@@ -346,6 +346,89 @@ const AdminDashboard = () => {
         </div>
       </div>
 
+      {/* ── Recent Users Table ── */}
+      <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: "1.5rem", marginBottom: "1.5rem" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
+          <h5 style={{ fontFamily: "var(--font-display)", fontWeight: 700, margin: 0 }}>
+            👥 Recent Registered Users
+          </h5>
+          <Link to="/admin/users" style={{ fontSize: "0.8rem", color: "#818cf8", textDecoration: "none" }}>
+            Manage Users →
+          </Link>
+        </div>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid var(--border)", color: "var(--text-dim)", fontSize: "0.85rem", textAlign: "left" }}>
+                <th style={{ padding: "0.75rem", fontWeight: 600 }}>User</th>
+                <th style={{ padding: "0.75rem", fontWeight: 600 }}>Role</th>
+                <th style={{ padding: "0.75rem", fontWeight: 600 }}>Joined Date</th>
+                <th style={{ padding: "0.75rem", fontWeight: 600, textAlign: "right" }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                [...Array(3)].map((_, i) => (
+                  <tr key={i}>
+                    <td colSpan="4" style={{ padding: "0.75rem" }}>
+                      <div style={{ height: 40, background: "var(--surface-2)", borderRadius: "var(--radius-sm)", animation: "skeleton-shimmer 1.6s infinite" }} />
+                    </td>
+                  </tr>
+                ))
+              ) : users.slice(-5).reverse().map((user, i) => (
+                <motion.tr 
+                  key={user._id || i}
+                  initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
+                  style={{ borderBottom: "1px solid var(--border)", transition: "background 0.2s" }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = "var(--surface-2)"}
+                  onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+                >
+                  <td style={{ padding: "1rem 0.75rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                      <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg, #6366f1, #a855f7)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", fontSize: "1rem" }}>
+                        {user.username?.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: "0.9rem", color: "var(--text)" }}>{user.username}</div>
+                        <div style={{ fontSize: "0.75rem", color: "var(--text-dim)" }}>{user.email}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ padding: "1rem 0.75rem" }}>
+                    <span style={{
+                      padding: "0.25rem 0.65rem", borderRadius: "9999px", fontSize: "0.7rem", fontWeight: 600,
+                      background: user.role === "admin" ? "rgba(239,68,68,0.1)" : user.role === "instructor" ? "rgba(245,158,11,0.1)" : "rgba(16,185,129,0.1)",
+                      color: user.role === "admin" ? "#ef4444" : user.role === "instructor" ? "#f59e0b" : "#10b981",
+                      border: `1px solid ${user.role === "admin" ? "rgba(239,68,68,0.2)" : user.role === "instructor" ? "rgba(245,158,11,0.2)" : "rgba(16,185,129,0.2)"}`
+                    }}>
+                      {user.role}
+                    </span>
+                  </td>
+                  <td style={{ padding: "1rem 0.75rem", fontSize: "0.85rem", color: "var(--text-muted)" }}>
+                    {new Date(user.createdAt || Date.now()).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                  </td>
+                  <td style={{ padding: "1rem 0.75rem", textAlign: "right" }}>
+                    <button 
+                      onClick={() => navigate(`/admin/users`)}
+                      style={{ background: "transparent", border: "1px solid var(--border)", padding: "0.3rem 0.75rem", borderRadius: "var(--radius-sm)", fontSize: "0.75rem", color: "var(--text)", cursor: "pointer", transition: "all 0.2s" }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#818cf8"; e.currentTarget.style.color = "#818cf8"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text)"; }}
+                    >
+                      View
+                    </button>
+                  </td>
+                </motion.tr>
+              ))}
+              {!loading && users.length === 0 && (
+                <tr>
+                  <td colSpan="4" style={{ padding: "2rem", textAlign: "center", color: "var(--text-dim)" }}>No users found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {/* ── Recent Blogs ── */}
       <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: "1.5rem" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>

@@ -42,7 +42,7 @@ const Chatbot = () => {
   };
 
   return (
-    <div style={{ position: "fixed", bottom: "2rem", right: "2rem", zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "1rem", fontFamily: "var(--font-sans, system-ui, sans-serif)" }}>
+    <div style={{ position: "fixed", bottom: "clamp(1rem, 3vw, 2rem)", right: "clamp(1rem, 3vw, 2rem)", zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "1rem", fontFamily: "var(--font-sans, system-ui, sans-serif)" }}>
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -51,8 +51,8 @@ const Chatbot = () => {
             exit={{ opacity: 0, y: 50, scale: 0.8, filter: "blur(10px)" }}
             transition={{ duration: 0.4, type: "spring", bounce: 0.3 }}
             style={{
-              width: "380px",
-              height: "450px",
+              width: "min(380px, calc(100vw - 2rem))",
+              height: "min(450px, calc(100vh - 6rem))",
               background: "rgba(255, 255, 255, 0.8)",
               backdropFilter: "blur(20px)",
               WebkitBackdropFilter: "blur(20px)",

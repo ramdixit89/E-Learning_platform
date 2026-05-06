@@ -127,3 +127,82 @@ exports.generateAiAssessment = async (req, res) => {
       });
   }
 };
+
+// Auto-Generate entire Course Skeleton based on Prompt
+exports.generateCourseSkeleton = async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    if (!prompt) {
+      return res.status(400).json({ message: "Prompt is required" });
+    }
+
+    const LLM_API_KEY = process.env.GROQ_API_KEY || process.env.LLM_API_KEY || "no_key_provided";
+    const LLM_BASE_URL = process.env.LLM_BASE_URL || "https://api.groq.com/openai/v1";
+    const LLM_MODEL = process.env.LLM_MODEL || "llama-3.1-8b-instant";
+
+    const systemPrompt = `
+      You are an elite Silicon Valley curriculum designer. Based on the user's prompt, generate an extremely comprehensive, advanced online course syllabus in JSON format.
+      The JSON MUST strictly follow this exact format, and contain NO other text, markdown, or explanation. ONLY raw JSON.
+      {
+        "title": "String (engaging course title)",
+        "description": "String (HTML formatted rich text description, at least 3 paragraphs explaining what they will build)",
+        "level": "String (either 'beginner', 'intermediate', or 'advanced')",
+        "duration": "String (e.g. '40h 30m')",
+        "tags": "String (comma separated tags e.g. 'react, frontend, hooks')",
+        "topics": [
+          {
+            "title": "String (Module title)",
+            "content": "String (HTML formatted extremely detailed content. YOU MUST INCLUDE practical projects, real-world scenarios, and <pre><code> formatted code snippets in this content. Make it long and educational.)"
+          }
+        ]
+      }
+      CRITICAL INSTRUCTION: Generate a massive, highly detailed course. Attempt to generate between 15 to 25 extremely detailed modules/topics in the array. Ensure every module contains practical coding projects and code blocks.
+    `;
+
+    const fetchUrl = LLM_BASE_URL.endsWith("/chat/completions") ? LLM_BASE_URL : `${LLM_BASE_URL.replace(/\/$/, '')}/chat/completions`;
+
+    const response = await fetch(fetchUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${LLM_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: LLM_MODEL,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.2, // Extremely low temp to enforce strict JSON
+        response_format: { type: "json_object" } // Optional safeguard if the model supports it
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("LLM API Error:", errorText);
+      return res.status(500).json({ message: "Failed to connect to the AI model.", error: errorText });
+    }
+
+    const data = await response.json();
+    let generatedText = data.choices[0].message.content.trim();
+
+    // Safety cleaner: strip codeblocks
+    if (generatedText.startsWith("```json")) generatedText = generatedText.substring(7);
+    if (generatedText.startsWith("```")) generatedText = generatedText.substring(3);
+    if (generatedText.endsWith("```")) generatedText = generatedText.substring(0, generatedText.length - 3);
+
+    let parsedJson;
+    try {
+      parsedJson = JSON.parse(generatedText.trim());
+    } catch (e) {
+      console.error("Raw AI Output:", generatedText);
+      throw new Error("AI failed to return valid JSON format.");
+    }
+
+    return res.status(200).json({ message: "Course generated successfully!", course: parsedJson });
+  } catch (error) {
+    console.error("Auto-Course Gen Error:", error);
+    res.status(500).json({ message: "Server error during AI generation.", error: error.message });
+  }
+};
